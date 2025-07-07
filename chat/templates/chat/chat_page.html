@@ -36,14 +36,17 @@
         const roomName = JSON.parse(document.getElementById('room-name-json').textContent);
         const chatLog = document.querySelector('#chat-log');
         const messageInput = document.querySelector('#chat-message-input');
-
+        
+        // ---------- ZDE JE TA DŮLEŽITÁ OPRAVA ----------
+        const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
         const chatSocket = new WebSocket(
-            'ws://'
+            protocol
             + window.location.host
             + '/ws/chat/'
             + roomName
             + '/'
         );
+        // --------------------------------------------------
 
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
