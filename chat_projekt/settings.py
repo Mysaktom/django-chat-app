@@ -38,6 +38,11 @@ ASGI_ALLOWED_HOSTS = [
     'neustadt-chat.onrender.com',
 ]
 
+# CSRF nastavení pro zabezpečení proti Cross-Site Request Forgery útokům
+CSRF_TRUSTED_ORIGINS = [
+    'https://neustadt-chat.onrender.com',
+]
+
 # Application definition
 
 INSTALLED_APPS = [
