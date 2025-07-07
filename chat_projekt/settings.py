@@ -30,8 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'whitenoise.runserver_nostatic',  # Upraveno pro WhiteNoise
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles', # Tento řádek je správný a musí zůstat
 ]
 
 MIDDLEWARE = [
