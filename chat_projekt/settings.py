@@ -162,8 +162,8 @@ CHANNEL_LAYERS = {
 
 # Cesty pro přihlášení a odhlášení
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'chat-page'
+LOGIN_REDIRECT_URL = 'room-selection'  # Kam přesměrovat po přihlášení
 LOGOUT_REDIRECT_URL = 'login'
 # Statické soubory pro WhiteNoise
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' # Komprimace a manifest pro statické soubory
 
