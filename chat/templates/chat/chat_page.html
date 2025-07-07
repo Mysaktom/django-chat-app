@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'chat/style.css' %}">
+</head>
+<body>
+    <div class="chat-container">
+        <header>
+            <div class="user-info">
+                <span>Uživatel: {{ request.user.username }}</span>
+                <form method="post" action="{% url 'logout' %}" class="logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-button">Odhlásit</button>
+                </form>
+            </div>
+        </header>
+
+        <div class="chat-window">
+            <div id="chat-log">
+                {% for message in messages %}
+                    <div><b>{{ message.author.username }}</b>: {{ message.content }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="message-input-area">
+                <input id="chat-message-input" type="text" placeholder="Napište zprávu a stiskněte Enter...">
+                <button id="chat-message-submit">Odeslat</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatLog = document.querySelector('#chat-log');
+        const messageInput = document.querySelector('#chat-message-input');
+
+        function addMessage(data) {
+            // OPRAVA: Vytvoříme nový div pro každou zprávu
+            const messageElement = document.createElement('div');
+            messageElement.innerHTML = `<b>${data.username}</b>: ${data.message}`;
+            chatLog.appendChild(messageElement);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+
+        const chatSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/chat/'
+        );
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            addMessage(data);
+        };
+
+        messageInput.focus();
+        messageInput.onkeyup = function(e) {
+            if (e.key === 'Enter') {
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            if (messageInput.value.trim() !== '') {
+                chatSocket.send(JSON.stringify({
+                    'message': messageInput.value
+                }));
+                messageInput.value = '';
+            }
+        };
+
+        chatLog.scrollTop = chatLog.scrollHeight;
+    </script>
+</body>
+</html>

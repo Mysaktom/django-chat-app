@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Přihlášení</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'chat/style.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Přihlaste se do Chatu</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Přihlásit</button>
+        </form>
+    </div>
+</body>
+</html>
