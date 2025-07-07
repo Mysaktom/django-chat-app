@@ -1,3 +1,4 @@
+# chat/consumers.py
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
@@ -6,8 +7,11 @@ from django.contrib.auth.models import User
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        # Získá název místnosti z URL
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = f'chat_{self.room_name}'
+
+        # Připojí se ke skupině specifické pro danou místnost
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
@@ -15,38 +19,43 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
+        # Odpojí se od skupiny
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
 
-        async def receive(self, text_data):
-            text_data_json = json.loads(text_data)
-            message = text_data_json['message']
-            username = self.scope['user'].username
-            
-            # ZDE PŘEDÁME I JMÉNO MÍSTNOSTI
-            await self.save_message(username, self.room_name, message)
+    # Přijme zprávu z WebSocketu
+    async def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json['message']
+        username = self.scope['user'].username
 
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {
-                    'type': 'chat_message',
-                    'message': message,
-                    'username': username
-                }
-            )
-    
+        # Uloží zprávu do databáze
+        await self.save_message(username, self.room_name, message)
+
+        # Rozešle zprávu do skupiny dané místnosti
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'chat_message',
+                'message': message,
+                'username': username
+            }
+        )
+
+    # Přijme zprávu z room group
     async def chat_message(self, event):
         message = event['message']
         username = event['username']
+
+        # Pošle zprávu zpět do WebSocketu (do prohlížeče)
         await self.send(text_data=json.dumps({
             'message': message,
             'username': username
         }))
 
     @database_sync_to_async
-    def save_message(self, username, room, message): # PŘIDALI JSME 'room'
+    def save_message(self, username, room, message):
         user = User.objects.get(username=username)
-        # ULOŽÍME ZPRÁVU I S NÁZVEM MÍSTNOSTI
         Message.objects.create(author=user, room=room, content=message)
