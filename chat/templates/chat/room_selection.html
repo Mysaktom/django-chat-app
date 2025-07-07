@@ -23,10 +23,17 @@
                 document.querySelector('#room-name-submit').click();
             }
         };
-        document.querySelector('#room-name-submit').onclick = function(e) {
-            var roomName = document.querySelector('#room-name-input').value.trim();
-            if (roomName) { // Přejde dál, jen pokud není název prázdný
-                window.location.pathname = '/chat/' + roomName + '/';
+       document.querySelector('#room-name-submit').onclick = function(e) {
+            let roomName = document.querySelector('#room-name-input').value.trim();
+            if (roomName) {
+                // Nová část pro "vyčištění" názvu
+                const cleanedRoomName = roomName
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Odstraní diakritiku
+                    .replace(/\s+/g, '-') // Nahradí mezery pomlčkou
+                    .replace(/[^\w-]+/g, '') // Odstraní všechny ostatní divné znaky
+                    .toLowerCase(); // Převede na malá písmena
+
+                window.location.pathname = '/chat/' + cleanedRoomName + '/';
             }
         };
     </script>
