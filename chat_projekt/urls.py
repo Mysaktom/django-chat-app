@@ -1,8 +1,9 @@
 # chat_projekt/urls.py
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include # Ujisti se, že je zde 'include'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('chat.urls')), # Přidání cesty pro aplikaci chat
+    # TENTO ŘÁDEK PŘIDEJ:
+    path('', include('chat.urls')),
 ]
