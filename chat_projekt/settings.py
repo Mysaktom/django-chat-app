@@ -26,12 +26,17 @@ SECRET_KEY = os.environ.get('SECRET_KEY') # Získá tajný klíč
 # Debug mode je vypnutý v produkci (DEBUG = False)
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1'] 
+# Allowed hosts - zde přidáme hostitele, na kterých může běžet aplikace
+ALLOWED_HOSTS = ['neustadt-chat.onrender.com', '127.0.0.1']
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
+# ASGI nastavení je důležité pro WebSocket a další asynchronní funkce
+ASGI_ALLOWED_HOSTS = [
+    'neustadt-chat.onrender.com',
+]
 
 # Application definition
 
