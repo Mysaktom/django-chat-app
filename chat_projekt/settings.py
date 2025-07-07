@@ -65,13 +65,21 @@ TEMPLATES = [
 WSGI_APPLICATION = 'chat_projekt.wsgi.application'
 ASGI_APPLICATION = 'chat_projekt.asgi.application'
 
-# Databáze se načítá z prostředí serveru
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600
-    )
-}
+# Použij dj_database_url pro načtení databáze z prostředí
+# Pokud není nastavena, použije se lokální sqlite3 databáze
+if 'DATABASE_URL' in os.environ:
+    # Použij produkční databázi na Renderu
+    DATABASES = {
+        'default': dj_database_url.config(conn_max_age=600)
+    }
+else:
+    # Použij lokální databázi sqlite3 pro vývoj
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Channel Layers pro chat v reálném čase
 CHANNEL_LAYERS = {

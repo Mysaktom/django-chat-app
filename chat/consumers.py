@@ -20,20 +20,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
 
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        username = self.scope['user'].username
-        await self.save_message(username, message)
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': message,
-                'username': username
-            }
-        )
+        async def receive(self, text_data):
+            text_data_json = json.loads(text_data)
+            message = text_data_json['message']
+            username = self.scope['user'].username
+            
+            # ZDE PŘEDÁME I JMÉNO MÍSTNOSTI
+            await self.save_message(username, self.room_name, message)
 
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': message,
+                    'username': username
+                }
+            )
+    
     async def chat_message(self, event):
         message = event['message']
         username = event['username']
@@ -43,6 +46,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         }))
 
     @database_sync_to_async
-    def save_message(self, username, message):
+    def save_message(self, username, room, message): # PŘIDALI JSME 'room'
         user = User.objects.get(username=username)
-        Message.objects.create(author=user, content=message)
+        # ULOŽÍME ZPRÁVU I S NÁZVEM MÍSTNOSTI
+        Message.objects.create(author=user, room=room, content=message)
