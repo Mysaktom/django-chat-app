@@ -1,36 +1,117 @@
 /* chat/static/chat/style.css */
+
+/* --- Obecné styly --- */
 body {
-    background-color: #f0f0f0; 
-    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     margin: 0;
     padding: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    box-sizing: border-box;
 }
 
+/* --- Styly pro přihlašovací stránku --- */
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    background-color: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.login-container h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #333;
+}
+
+.login-container form p {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.login-container form label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.login-container input {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.2s;
+}
+
+.login-container input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.login-container button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    background-color: #d73a49;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-top: 10px;
+    transition: background-color 0.2s;
+}
+
+.login-container button:hover {
+    background-color: #b83241;
+}
+
+/* ZDE JE TA DŮLEŽITÁ ÚPRAVA PRO CHYBOVOU HLÁŠKU */
+.errorlist {
+    list-style-type: none; /* Odstraní odrážku */
+    padding: 10px;
+    margin: 0 0 20px 0;
+    color: #721c24; /* Tmavě červený text */
+    background-color: #f8d7da; /* Světle červené pozadí */
+    border: 1px solid #f5c6cb; /* Červený rámeček */
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* --- Styly pro chatovací stránku --- */
 .chat-container {
     width: 90%;
     max-width: 800px;
-    background-color: #f8f8f2; 
+    background-color: #f8f8f2;
     border: 1px solid #ccc;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
+    height: 80vh;
 }
 
 header {
-    background-color: #e0e0e0; 
+    background-color: #e0e0e0;
     padding: 10px 20px;
     border-bottom: 1px solid #ccc;
     display: flex;
-    justify-content: flex-end; 
+    justify-content: flex-end;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .user-info {
     font-size: 14px;
+    display: flex;
+    align-items: center;
 }
 
 .user-info span {
@@ -39,42 +120,57 @@ header {
     color: #333;
 }
 
-.user-info a {
-    text-decoration: none;
-    color: #fff;
-    background-color: #d73a49; 
-    border: 1px solid #d73a49;
+.logout-form {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+.logout-button {
+    background-color: #d73a49;
+    color: white;
+    border: none;
     padding: 6px 12px;
     border-radius: 4px;
+    font-family: inherit;
+    font-size: 14px;
     font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+    background-color: #b83241;
 }
 
 .chat-window {
     padding: 20px;
-    flex-grow: 1; 
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 #chat-log {
-    flex-grow: 1; 
-    height: 400px; 
+    flex-grow: 1;
     border: 1px solid #ccc;
     padding: 10px;
     font-family: monospace;
     font-size: 14px;
+    line-height: 1.5;
     background-color: #fff;
-    overflow-y: scroll; 
+    overflow-y: scroll;
     margin-bottom: 15px;
 }
 
 .message-input-area {
     display: flex;
-    gap: 10px; 
+    gap: 10px;
+    flex-shrink: 0;
 }
 
 #chat-message-input {
-    flex-grow: 1; 
+    flex-grow: 1;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -84,33 +180,9 @@ header {
 #chat-message-submit {
     padding: 10px 20px;
     border: none;
-    background-color: #28a745; /* Zelené tlačítko */
+    background-color: #28a745;
     color: white;
     cursor: pointer;
     border-radius: 4px;
     font-weight: bold;
-}
-
-.logout-form {
-    display: inline; /* Aby byl formulář na stejném řádku jako jméno */
-    margin: 0;
-    padding: 0;
-}
-
-.logout-button {
-    /* Vzhled tlačítka, aby vypadalo jako původní odkaz */
-    background-color: #d73a49;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-left: 15px; /* Odsazení od jména */
-}
-
-.logout-button:hover {
-    background-color: #b83241;
 }
