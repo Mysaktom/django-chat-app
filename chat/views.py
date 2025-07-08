@@ -16,14 +16,10 @@ def room_selection(request):
 @login_required
 def room_selection(request):
     # Krok 1: Získáme všechny unikátní názvy místností z databáze
-    all_rooms = Message.objects.values_list('room', flat=True).distinct()
-    
-    # Krok 2: Vyčistíme je a odstraníme duplikáty v Pythonu pro jistotu
-    # Ořízne mezery, převede na malá písmena a vezme jen unikátní hodnoty
-    cleaned_rooms = sorted(list(set(r.strip().lower() for r in all_rooms if r)))
+    rooms = Room.objects.all()
     
     return render(request, 'chat/room_selection.html', {
-        'rooms': cleaned_rooms
+        'rooms': rooms
     })
 
 @login_required
