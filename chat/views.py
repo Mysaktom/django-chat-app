@@ -6,7 +6,11 @@ from .models import Message
 # TUTO FUNKCI PŘIDEJ:
 @login_required
 def room_selection(request):
-    return render(request, 'chat/room_selection.html')
+    # Získáme všechny unikátní názvy místností z uložených zpráv
+    rooms = Message.objects.values_list('room', flat=True).distinct()
+    return render(request, 'chat/room_selection.html', {
+        'rooms': rooms
+    })
 
 @login_required
 def chat_page(request, room_name):

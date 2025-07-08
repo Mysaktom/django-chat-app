@@ -86,7 +86,7 @@ body {
     text-align: center;
 }
 
-/* --- Styly pro chatovací stránku --- */
+/* --- STYLY PRO CHATOVACÍ STRÁNKU --- */
 .chat-container {
     width: 90%;
     max-width: 800px;
@@ -185,4 +185,89 @@ header {
     cursor: pointer;
     border-radius: 4px;
     font-weight: bold;
+}
+
+/* === STYLY PRO VÝBĚR MÍSTNOSTI === */
+
+.selection-container {
+    width: 100%;
+    max-width: 500px;
+    background-color: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.selection-container h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.selection-container p {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.selection-container .input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.selection-container input {
+    flex-grow: 1;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.2s;
+}
+
+.selection-container input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.selection-container button {
+    padding: 12px 20px;
+    border: none;
+    background-color: #28a745;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.selection-container button:hover {
+    background-color: #218838;
+}
+
+.room-list { 
+    margin-top: 40px; 
+    border-top: 1px solid #eee;
+    padding-top: 30px;
+}
+
+.room-list h3 {
+    margin-top: 0;
+    color: #444;
+}
+
+.room-list a { 
+    display: inline-block; 
+    margin: 5px; 
+    padding: 8px 15px; 
+    background-color: #007bff; 
+    color: white; 
+    text-decoration: none; 
+    border-radius: 20px;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.room-list a:hover {
+    background-color: #0056b3;
 }
