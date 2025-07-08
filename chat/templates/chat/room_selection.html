@@ -19,7 +19,7 @@
             <div class="room-list">
                 <h3>Nebo vyber z existujících:</h3>
                 {% for room in rooms %}
-                    <a href="{% url 'chat-page' room_name=room %}">{{ room }}</a>
+                    <a href="{% url 'chat-page' room_name=room.name %}">{{ room.name }}</a>
                 {% endfor %}
             </div>
         {% endif %}
