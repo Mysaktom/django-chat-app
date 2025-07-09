@@ -8,7 +8,7 @@ body {
     background-color: #f0f0f0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     margin: 0;
-    padding: 0; /* Padding přesuneme do main-content */
+    padding: 0;
 }
 
 /* --- Navigační lišta --- */
@@ -39,6 +39,12 @@ body {
     display: flex;
     align-items: center;
     gap: 20px;
+}
+
+.nav-room-name {
+    color: #a0a0a0;
+    border-right: 1px solid #555;
+    padding-right: 20px;
 }
 
 .nav-user .nav-link {
@@ -78,12 +84,12 @@ body {
     width: 100%;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Zarovnání nahoru */
     padding: 40px 20px;
     min-height: calc(100vh - 60px);
 }
 
-/* --- Kontejnery pro přihlášení, výběr místnosti atd. --- */
+/* --- Kontejnery pro přihlášení, výběr místnosti --- */
 .login-container, .selection-container {
     width: 100%;
     max-width: 500px;
@@ -93,108 +99,20 @@ body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     text-align: center;
 }
+/* ... další styly pro login a selection ... */
 
-.login-container h2, .selection-container h2 {
-    margin-top: 0;
-    margin-bottom: 25px;
-    color: #333;
-}
-
-.login-container form p {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    margin-bottom: 15px;
-}
-
-.login-container form label {
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #555;
-}
-
-.login-container input, .selection-container input {
-    flex-grow: 1;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
-    transition: border-color 0.2s;
-}
-
-.login-container input:focus, .selection-container input:focus {
-    outline: none;
-    border-color: #007bff;
-}
-
-.login-container button, .selection-container button {
-    padding: 12px 20px;
-    border: none;
-    color: white;
-    font-weight: bold;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-}
-.login-container button { background-color: #d73a49; }
-.login-container button:hover { background-color: #b83241; }
-
-.selection-container button { background-color: #28a745; }
-.selection-container button:hover { background-color: #218838; }
-
-.selection-container .input-group {
-    display: flex;
-    gap: 10px;
-}
-
-/* --- Chybová hláška --- */
-.errorlist {
-    list-style-type: none;
-    padding: 10px;
-    margin: 0 0 20px 0;
-    color: #721c24;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    border-radius: 4px;
-    text-align: center;
-}
-
-/* --- Seznam místností --- */
-.room-list {
-    margin-top: 40px;
-    border-top: 1px solid #eee;
-    padding-top: 30px;
-}
-.room-list h3 {
-    margin-top: 0;
-    color: #444;
-}
-.room-list a {
-    display: inline-block;
-    margin: 5px;
-    padding: 8px 15px;
-    background-color: #007bff;
-    color: white;
-    text-decoration: none;
-    border-radius: 20px;
-    font-size: 14px;
-    transition: background-color 0.2s;
-}
-.room-list a:hover {
-    background-color: #0056b3;
-}
 
 /* --- Chatovací okno --- */
 .chat-container {
-    width: 90%;
+    width: 100%;
     max-width: 800px;
-    background-color: #f8f8f2;
-    border: 1px solid #ccc;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    height: calc(100vh - 140px); /* Menší výška okna */
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 100px); /* Upraveno pro pohled s navigací */
 }
 
 .chat-window {
@@ -207,14 +125,15 @@ body {
 
 #chat-log {
     flex-grow: 1;
-    border: 1px solid #ccc;
-    padding: 10px;
+    border: 1px solid #eee;
+    padding: 15px;
     font-family: monospace;
     font-size: 14px;
-    line-height: 1.5;
-    background-color: #fff;
-    overflow-y: scroll;
+    line-height: 1.6;
+    background-color: #fdfdfd;
+    overflow-y: auto;
     margin-bottom: 15px;
+    border-radius: 4px;
 }
 
 .message-input-area {
@@ -223,14 +142,33 @@ body {
     flex-shrink: 0;
 }
 
+/* VYLEPŠENÉ STYLY PRO INPUT A TLAČÍTKO */
 #chat-message-input {
     flex-grow: 1;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* --- Přihlašovací stránka --- */
-.login-page-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+#chat-message-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+#chat-message-submit {
+    padding: 12px 20px;
+    border: none;
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+#chat-message-submit:hover {
+    background-color: #218838;
 }

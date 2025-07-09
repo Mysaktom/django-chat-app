@@ -11,15 +11,19 @@
             <a href="{% url 'room-selection' %}">Neustadt Chat</a>
         </div>
         <div class="nav-user">
-            {% if user.is_authenticated %}
-                <span>Uživatel: {{ user.username }}</span>
-                <a href="{% url 'password-change' %}" class="nav-link">Změnit heslo</a>
-                <form method="post" action="{% url 'logout' %}" class="logout-form">
-                    {% csrf_token %}
-                    <button type="submit" class="logout-button">Odhlásit</button>
-                </form>
+        {% if user.is_authenticated %}
+            
+            {% if room_name %}
+                <span class="nav-room-name">Místnost: <b>{{ room_name }}</b></span>
             {% endif %}
-        </div>
+            <span>Uživatel: {{ user.username }}</span>
+            <a href="{% url 'password-change' %}" class="nav-link">Změnit heslo</a>
+            <form method="post" action="{% url 'logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="logout-button">Odhlásit</button>
+            </form>
+        {% endif %}
+</div>
     </nav>
 
     <main class="main-content">
