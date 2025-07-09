@@ -271,3 +271,76 @@ header {
 .room-list a:hover {
     background-color: #0056b3;
 }
+
+/* === STYLY PRO NAVIGACI A HLAVNÍ OBSAH === */
+
+.main-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #343a40;
+    color: white;
+    padding: 0 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+.nav-brand a {
+    color: white;
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.nav-user {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-user .nav-link {
+    color: #ccc;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.nav-user .nav-link:hover {
+    color: white;
+}
+
+/* Přesuneme logout-button styly sem, aby byly obecné */
+.logout-form {
+    margin: 0;
+}
+
+.logout-button {
+    background-color: #d73a49;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+    background-color: #b83241;
+}
+
+/* Hlavní kontejner pro obsah, aby začínal pod navigací */
+.main-content {
+    margin-top: 60px; /* Výška navigační lišty */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}

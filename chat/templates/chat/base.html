@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Neustadt Chat</title>
+    <link rel="stylesheet" href="{% static 'chat/style.css' %}">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-brand">
+            <a href="{% url 'room-selection' %}">Neustadt Chat</a>
+        </div>
+        <div class="nav-user">
+            {% if user.is_authenticated %}
+                <span>Uživatel: {{ user.username }}</span>
+                <a href="{% url 'password-change' %}" class="nav-link">Změnit heslo</a>
+                <form method="post" action="{% url 'logout' %}" class="logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-button">Odhlásit</button>
+                </form>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html>

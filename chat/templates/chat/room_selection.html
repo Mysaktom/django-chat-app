@@ -1,50 +1,43 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Vyberte místnost</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'chat/style.css' %}">
-</head>
-<body>
-    <div class="selection-container">
-        <h2>Zadejte název místnosti</h2>
-        <p>Vytvořte novou místnost nebo vstupte do existující.</p>
-        
-        <div class="input-group">
-            <input type="text" id="room-name-input" placeholder="např. nova-mistnost">
-            <button id="room-name-submit">Vstoupit</button>
-        </div>
+{% extends 'chat/base.html' %}
 
-        {% if rooms %}
-            <div class="room-list">
-                <h3>Nebo vyber z existujících:</h3>
-                {% for room in rooms %}
-                    <a href="{% url 'chat-page' room_name=room.name %}">{{ room.name }}</a>
-                {% endfor %}
-            </div>
-        {% endif %}
+{% block content %}
+<div class="selection-container">
+    <h2>Zadejte název místnosti</h2>
+    <p>Vytvořte novou místnost nebo vstupte do existující.</p>
+    
+    <div class="input-group">
+        <input type="text" id="room-name-input" placeholder="např. nova-mistnost">
+        <button id="room-name-submit">Vstoupit</button>
     </div>
 
-    <script>
-        document.querySelector('#room-name-input').focus();
-        document.querySelector('#room-name-input').onkeyup = function(e) {
-            if (e.key === 'Enter') {
-                document.querySelector('#room-name-submit').click();
-            }
-        };
-       document.querySelector('#room-name-submit').onclick = function(e) {
-            let roomName = document.querySelector('#room-name-input').value.trim();
-            if (roomName) {
-                // Nová část pro "vyčištění" názvu
-                const cleanedRoomName = roomName
-                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Odstraní diakritiku
-                    .replace(/\s+/g, '-') // Nahradí mezery pomlčkou
-                    .replace(/[^\w-]+/g, '') // Odstraní všechny ostatní divné znaky
-                    .toLowerCase(); // Převede na malá písmena
+    {% if rooms %}
+        <div class="room-list">
+            <h3>Nebo vyber z existujících:</h3>
+            {% for room in rooms %}
+                <a href="{% url 'chat-page' room_name=room.name %}">{{ room.name }}</a>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
 
-                window.location.pathname = '/chat/' + cleanedRoomName + '/';
-            }
-        };
-    </script>
-</body>
-</html>
+<script>
+    // JavaScript zůstává stejný
+    document.querySelector('#room-name-input').focus();
+    document.querySelector('#room-name-input').onkeyup = function(e) {
+        if (e.key === 'Enter') {
+            document.querySelector('#room-name-submit').click();
+        }
+    };
+    document.querySelector('#room-name-submit').onclick = function(e) {
+        let roomName = document.querySelector('#room-name-input').value.trim();
+        if (roomName) {
+            const cleanedRoomName = roomName
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/\s+/g, '-')
+                .replace(/[^\w-]+/g, '')
+                .toLowerCase();
+            window.location.pathname = '/chat/' + cleanedRoomName + '/';
+        }
+    };
+</script>
+{% endblock %}
