@@ -5,8 +5,8 @@
     <title>Přihlášení</title>
     <link rel="stylesheet" href="{% static 'chat/style.css' %}">
 </head>
-<body class="login-page-body"> 
-    <div class="login-container">
+<body class="standalone-page-body">
+    <div class="form-container">
         <h2>Přihlaste se do Chatu</h2>
         <form method="post">
             {% if form.non_field_errors %}
@@ -18,7 +18,7 @@
             {% endif %}
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit">Přihlásit</button>
+            <button type="submit" class="btn-login">Přihlásit</button>
         </form>
     </div>
 </body>

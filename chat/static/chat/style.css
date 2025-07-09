@@ -11,7 +11,7 @@ body {
     padding: 0;
 }
 
-/* --- Hlavní obsah --- */
+/* --- Hlavní obsah pro stránky s navigací --- */
 .main-content {
     margin-top: 60px; /* Výška navigační lišty */
     width: 100%;
@@ -22,7 +22,7 @@ body {
     min-height: calc(100vh - 60px);
 }
 
-/* Speciální styl pro centrování stránek bez navigace (přihlášení) */
+/* TOTO JE KLÍČOVÁ OPRAVA: Speciální styl pro centrování stránek bez navigace */
 .standalone-page-body {
     display: flex;
     justify-content: center;
@@ -79,7 +79,7 @@ body {
     cursor: pointer;
 }
 
-/* --- Kontejnery pro formuláře (Login, Room Selection, Password Change) --- */
+/* --- Kontejnery pro formuláře (Login, Room Selection, atd.) --- */
 .form-container {
     width: 100%;
     max-width: 500px;
@@ -132,6 +132,18 @@ body {
 .form-container .input-group input { flex-grow: 1; }
 .form-container .btn-login { background-color: #d73a49; }
 .form-container .btn-action { background-color: #28a745; }
+
+/* --- Chybová hláška --- */
+.errorlist {
+    list-style-type: none;
+    padding: 10px;
+    margin: 0 0 20px 0;
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    text-align: center;
+}
 
 /* --- Seznam místností --- */
 .room-list {
