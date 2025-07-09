@@ -1,18 +1,32 @@
 # chat/urls.py
-from django.urls import path
-from django.contrib.auth.views import LoginView, LogoutView
+from django.urls import path, reverse_lazy
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.views import LoginView, LogoutView 
 from . import views
 
 urlpatterns = [
-    # Stránka pro výběr místnosti (např. /chat/)
+    # Cesty pro chat
     path('chat/', views.room_selection, name='room-selection'),
-    
-    # Stránka pro konkrétní chatovací místnost (např. /chat/obecny-pokec/)
     path('chat/<str:room_name>/', views.chat_page, name='chat-page'),
-    
-    # Přihlašovací stránka (/)
+
+    # Cesty pro přihlášení a odhlášení
     path('', LoginView.as_view(template_name='chat/login_page.html'), name='login'),
-    
-    # Odhlášení
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
+
+    # Cesty pro změnu hesla
+    path(
+        'password-change/',
+        auth_views.PasswordChangeView.as_view(
+            template_name='chat/password_change_form.html',
+            success_url=reverse_lazy('password-change-done')
+        ),
+        name='password-change'
+    ),
+    path(
+        'password-change/done/',
+        auth_views.PasswordChangeDoneView.as_view(
+            template_name='chat/password_change_done.html'
+        ),
+        name='password-change-done'
+    ),
 ]
