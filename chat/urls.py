@@ -17,7 +17,7 @@ urlpatterns = [
     path(
         'password-change/',
         auth_views.PasswordChangeView.as_view(
-            template_name='chat/password_change_form.html',
+            template_name='chat/password_change_form.html', # <- Odkaz na šablonu formuláře
             success_url=reverse_lazy('password-change-done')
         ),
         name='password-change'
@@ -25,7 +25,7 @@ urlpatterns = [
     path(
         'password-change/done/',
         auth_views.PasswordChangeDoneView.as_view(
-            template_name='chat/password_change_done.html'
+            template_name='chat/password_change_done.html' # <- Odkaz na šablonu s potvrzením
         ),
         name='password-change-done'
     ),
