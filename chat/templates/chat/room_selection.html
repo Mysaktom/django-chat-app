@@ -1,43 +1,91 @@
 {% extends 'chat/base.html' %}
 
 {% block content %}
-<div class="form-container">
+<div class="selection-container">
     <h2>Zadejte název místnosti</h2>
     <p>Vytvořte novou místnost nebo vstupte do existující.</p>
     
     <div class="input-group">
         <input type="text" id="room-name-input" placeholder="např. nova-mistnost">
-        <button id="room-name-submit" class="btn-action">Vstoupit</button>
+        <button id="enter-room-button">Vstoupit</button>
     </div>
 
     {% if rooms %}
         <div class="room-list">
             <h3>Nebo vyber z existujících:</h3>
             {% for room in rooms %}
-                <a href="{% url 'chat-page' room_name=room.name %}">{{ room.name }}</a>
+                <a href="#" class="room-link" data-roomname="{{ room.name }}">{{ room.name }}</a>
             {% endfor %}
         </div>
     {% endif %}
 </div>
 
+<div id="rules-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <h3>Pravidla Chatu</h3>
+        <ul>
+            <li>Chovejte se k ostatním s respektem.</li>
+            <li>Žádný spam ani reklama.</li>
+            <li>Udržujte konverzaci relevantní k tématu místnosti.</li>
+            <li>Nezveřejňujte nelegální nebo nevhodný obsah.</li>
+            <li>Administrátoři mají právo kdykoliv bez varování smazat zprávu nebo zablokovat uživatele, který porušuje pravidla.</li>
+        </ul>
+        <div class="consent-check">
+            <input type="checkbox" id="rules-consent-checkbox">
+            <label for="rules-consent-checkbox">Rozumím a souhlasím s pravidly.</label>
+        </div>
+        <button id="confirm-enter-room" disabled>Vstoupit do místnosti</button>
+        <button id="cancel-enter-room">Zrušit</button>
+    </div>
+</div>
+
 <script>
-    // JavaScript zůstává stejný
-    document.querySelector('#room-name-input').focus();
-    document.querySelector('#room-name-input').onkeyup = function(e) {
-        if (e.key === 'Enter') {
-            document.querySelector('#room-name-submit').click();
-        }
-    };
-    document.querySelector('#room-name-submit').onclick = function(e) {
-        let roomName = document.querySelector('#room-name-input').value.trim();
+    const roomNameInput = document.querySelector('#room-name-input');
+    const enterRoomButton = document.querySelector('#enter-room-button');
+    const roomLinks = document.querySelectorAll('.room-link');
+    const modal = document.querySelector('#rules-modal');
+    const consentCheckbox = document.querySelector('#rules-consent-checkbox');
+    const confirmButton = document.querySelector('#confirm-enter-room');
+    const cancelButton = document.querySelector('#cancel-enter-room');
+
+    let targetRoomName = '';
+
+    function cleanRoomName(name) {
+        return name
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/\s+/g, '-')
+            .replace(/[^\w-]+/g, '')
+            .toLowerCase();
+    }
+    
+    function attemptToEnterRoom(roomName) {
         if (roomName) {
-            const cleanedRoomName = roomName
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/\s+/g, '-')
-                .replace(/[^\w-]+/g, '')
-                .toLowerCase();
-            window.location.pathname = '/chat/' + cleanedRoomName + '/';
+            targetRoomName = roomName;
+            modal.style.display = 'flex';
         }
+    }
+
+    enterRoomButton.onclick = () => attemptToEnterRoom(roomNameInput.value.trim());
+    roomLinks.forEach(link => {
+        link.onclick = (e) => {
+            e.preventDefault();
+            attemptToEnterRoom(link.dataset.roomname);
+        };
+    });
+
+    consentCheckbox.onchange = function() {
+        confirmButton.disabled = !this.checked;
+    };
+
+    cancelButton.onclick = () => {
+        modal.style.display = 'none';
+        consentCheckbox.checked = false;
+        confirmButton.disabled = true;
+    };
+
+    confirmButton.onclick = function() {
+        const cleanedRoomName = cleanRoomName(targetRoomName);
+        window.location.pathname = '/chat/' + cleanedRoomName + '/';
     };
 </script>
 {% endblock %}
