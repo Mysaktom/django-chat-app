@@ -22,7 +22,7 @@ body {
     min-height: calc(100vh - 60px);
 }
 
-/* TOTO JE KLÍČOVÁ OPRAVA: Speciální styl pro centrování stránek bez navigace */
+/* Speciální styl pro centrování stránek bez navigace (přihlášení) */
 .standalone-page-body {
     display: flex;
     justify-content: center;
@@ -66,6 +66,10 @@ body {
 .nav-user .nav-link {
     color: #ccc;
     text-decoration: none;
+    transition: color 0.2s;
+}
+.nav-user .nav-link:hover {
+    color: white;
 }
 .logout-form { margin: 0; }
 .logout-button {
@@ -77,6 +81,10 @@ body {
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
+    transition: background-color 0.2s;
+}
+.logout-button:hover {
+    background-color: #b83241;
 }
 
 /* --- Kontejnery pro formuláře (Login, Room Selection, atd.) --- */
@@ -114,6 +122,12 @@ body {
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-container input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 .form-container button {
     width: 100%;
@@ -124,6 +138,7 @@ body {
     font-size: 16px;
     cursor: pointer;
     border-radius: 4px;
+    transition: background-color 0.2s;
 }
 .form-container .input-group {
     display: flex;
@@ -131,7 +146,9 @@ body {
 }
 .form-container .input-group input { flex-grow: 1; }
 .form-container .btn-login { background-color: #d73a49; }
+.form-container .btn-login:hover { background-color: #b83241; }
 .form-container .btn-action { background-color: #28a745; }
+.form-container .btn-action:hover { background-color: #218838; }
 
 /* --- Chybová hláška --- */
 .errorlist {
@@ -164,6 +181,10 @@ body {
     text-decoration: none;
     border-radius: 20px;
     font-size: 14px;
+    transition: background-color 0.2s;
+}
+.room-list a:hover {
+    background-color: #0056b3;
 }
 
 /* --- Chatovací okno --- */
@@ -208,6 +229,12 @@ body {
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+#chat-message-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 #chat-message-submit {
     padding: 12px 20px;
@@ -217,6 +244,10 @@ body {
     cursor: pointer;
     border-radius: 4px;
     font-weight: bold;
+    transition: background-color 0.2s;
+}
+#chat-message-submit:hover {
+    background-color: #218838;
 }
 
 /* Styl pro časové razítko u zprávy */
@@ -234,7 +265,7 @@ body {
     width: 100%;
     height: 100%;
     background-color: rgba(0,0,0,0.6);
-    display: flex;
+    display: none; /* Skryté ve výchozím stavu */
     justify-content: center;
     align-items: center;
     z-index: 2000;
@@ -264,4 +295,13 @@ body {
 }
 #cancel-enter-room {
     background-color: #6c757d;
+}
+#cancel-enter-room:hover {
+    background-color: #5a6268;
+}
+#confirm-enter-room {
+    background-color: #28a745;
+}
+#confirm-enter-room:hover:not(:disabled) {
+    background-color: #218838;
 }
