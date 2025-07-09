@@ -1,14 +1,21 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Přihlášení</title>
-    {% load static %}
     <link rel="stylesheet" href="{% static 'chat/style.css' %}">
 </head>
-<body>
+<body class="login-page-body"> 
     <div class="login-container">
         <h2>Přihlaste se do Chatu</h2>
         <form method="post">
+            {% if form.non_field_errors %}
+                <ul class="errorlist">
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit">Přihlásit</button>

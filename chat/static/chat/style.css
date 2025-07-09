@@ -226,3 +226,11 @@ body {
 #chat-message-input {
     flex-grow: 1;
 }
+
+/* --- Přihlašovací stránka --- */
+.login-page-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
