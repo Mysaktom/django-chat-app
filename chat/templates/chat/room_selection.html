@@ -1,13 +1,13 @@
 {% extends 'chat/base.html' %}
 
 {% block content %}
-<div class="selection-container">
+<div class="form-container">
     <h2>Zadejte název místnosti</h2>
     <p>Vytvořte novou místnost nebo vstupte do existující.</p>
     
     <div class="input-group">
         <input type="text" id="room-name-input" placeholder="např. nova-mistnost">
-        <button id="room-name-submit">Vstoupit</button>
+        <button id="room-name-submit" class="btn-action">Vstoupit</button>
     </div>
 
     {% if rooms %}
