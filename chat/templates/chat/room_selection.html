@@ -50,6 +50,7 @@
 
     let targetRoomName = '';
 
+    // Funkce, která "vyčistí" název místnosti pro URL
     function cleanRoomName(name) {
         return name
             .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -58,13 +59,32 @@
             .toLowerCase();
     }
     
-    function attemptToEnterRoom(roomName) {
-        if (roomName) {
-            targetRoomName = roomName;
-            modal.style.display = 'flex';
+    // Funkce, která přesměruje uživatele do místnosti
+    function navigateToRoom(roomName) {
+        const cleanedName = cleanRoomName(roomName);
+        if (cleanedName) {
+            window.location.pathname = '/chat/' + cleanedName + '/';
         }
     }
 
+    // Hlavní funkce, která rozhodne, co se stane po kliknutí
+    function attemptToEnterRoom(roomName) {
+        if (roomName) {
+            targetRoomName = roomName;
+
+            // ZDE JE TA NOVÁ KOUZELNÁ ČÁST:
+            // Podíváme se, jestli už uživatel v minulosti souhlasil
+            if (localStorage.getItem('rules_agreed') === 'true') {
+                // Pokud ano, rovnou ho přesměrujeme
+                navigateToRoom(targetRoomName);
+            } else {
+                // Pokud ne, zobrazíme mu okno s pravidly
+                modal.style.display = 'flex';
+            }
+        }
+    }
+
+    // Přiřazení událostí k tlačítkům
     enterRoomButton.onclick = () => attemptToEnterRoom(roomNameInput.value.trim());
     roomLinks.forEach(link => {
         link.onclick = (e) => {
@@ -73,19 +93,22 @@
         };
     });
 
+    // Povolí/zakáže potvrzovací tlačítko v modálním okně
     consentCheckbox.onchange = function() {
         confirmButton.disabled = !this.checked;
     };
 
+    // Zavře modální okno
     cancelButton.onclick = () => {
         modal.style.display = 'none';
         consentCheckbox.checked = false;
         confirmButton.disabled = true;
     };
 
+    // Po potvrzení pravidel se uloží souhlas a přesměruje se
     confirmButton.onclick = function() {
-        const cleanedRoomName = cleanRoomName(targetRoomName);
-        window.location.pathname = '/chat/' + cleanedRoomName + '/';
+        // Uložíme si poznámku do paměti prohlížeče
+        localStorage.setItem('rules_agreed', 'true');
+        navigateToRoom(targetRoomName);
     };
 </script>
-{% endblock %}
