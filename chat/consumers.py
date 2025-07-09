@@ -4,6 +4,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from .models import Message, Room
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -27,23 +28,32 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # Přijme zprávu z WebSocketu
     async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        username = self.scope['user'].username
+            text_data_json = json.loads(text_data)
+            message = text_data_json['message']
+            username = self.scope['user'].username
 
-        # Uloží zprávu do databáze
-        await self.save_message(username, self.room_name, message)
+            new_message = await self.save_message(username, self.room_name, message)
+            
+            # Zjistíme, jestli je datum zprávy dnešní
+            today = timezone.now().date()
+            if new_message.timestamp.date() == today:
+                # Pokud ano, pošleme jen čas
+                timestamp_str = new_message.timestamp.strftime('%H:%M')
+            else:
+                # Pokud ne, pošleme datum
+                timestamp_str = new_message.timestamp.strftime('%d.%m.%Y')
 
-        # Rozešle zprávu do skupiny dané místnosti
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': message,
-                'username': username,
-            }
-        )
-
+            # Rozešleme zprávu do skupiny s upraveným časem
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': message,
+                    'username': username,
+                    'timestamp': timestamp_str
+                }
+            )
+    
     # Přijme zprávu z room group
     async def chat_message(self, event):
         message = event['message']

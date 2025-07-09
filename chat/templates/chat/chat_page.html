@@ -4,14 +4,23 @@
 <div class="chat-container">
     <div class="chat-window">
         <div id="chat-log">
+            {% now "d.m.Y" as today_date %}
+
             {% for message in messages %}
                 <div>
-                    <span class="message-time">{{ message.timestamp|date:"H:i" }}</span>
+                    <span class="message-time">
+                        {% if message.timestamp|date:"d.m.Y" == today_date %}
+                            {{ message.timestamp|date:"H:i" }}
+                        {% else %}
+                            {{ message.timestamp|date:"d.m.Y" }}
+                        {% endif %}
+                    </span>
                     <b>{{ message.author.username }}</b>: 
                     <span>{{ message.content }}</span>
                 </div>
             {% endfor %}
         </div>
+        
         <div class="message-input-area">
             <input id="chat-message-input" type="text" placeholder="Napište zprávu a stiskněte Enter...">
             <button id="chat-message-submit">Odeslat</button>
