@@ -218,3 +218,10 @@ body {
     border-radius: 4px;
     font-weight: bold;
 }
+
+/* Styl pro časové razítko u zprávy */
+.message-time {
+    color: #999;
+    font-size: 12px;
+    margin-right: 8px;
+}

@@ -40,7 +40,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             {
                 'type': 'chat_message',
                 'message': message,
-                'username': username
+                'username': username,
             }
         )
 
@@ -52,13 +52,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Pošle zprávu zpět do WebSocketu (do prohlížeče)
         await self.send(text_data=json.dumps({
             'message': message,
-            'username': username
+            'username': username,
+            'timestamp': event['timestamp']
         }))
 
     @database_sync_to_async
-    def save_message(self, username, room_name, message):
+    def save_message(self, username, room, message):
         user = User.objects.get(username=username)
-        # Najde místnost podle jména, nebo ji vytvoří, pokud neexistuje
-        room, created = Room.objects.get_or_create(name=room_name)
+        room, created = Room.objects.get_or_create(name=room)
         
-        Message.objects.create(author=user, room=room, content=message)
+        new_msg_obj = Message.objects.create(author=user, room=room, content=message)
+        return new_msg_obj # PŘIDÁNO
