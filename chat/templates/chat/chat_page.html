@@ -1,82 +1,151 @@
 {% extends 'chat/base.html' %}
 
 {% block content %}
-<div class="chat-container">
-    <div class="chat-window">
-        <div id="chat-log">
-            {% now "d.m.Y" as today_date %}
+<div class="main-view-container">
+    <div class="view-switcher">
+        <button id="show-chat-btn" class="active">Chat</button>
+        <button id="show-canvas-btn">Plátno</button>
+    </div>
 
-            {% for message in messages %}
-                <div>
-                    <span class="message-time">
-                        {% if message.timestamp|date:"d.m.Y" == today_date %}
-                            {{ message.timestamp|date:"H:i" }}
-                        {% else %}
-                            {{ message.timestamp|date:"d.m.Y" }}
-                        {% endif %}
-                    </span>
-                    <b>{{ message.author.username }}</b>: 
-                    <span>{{ message.content }}</span>
+    <div id="chat-view" class="view active">
+        <div class="chat-container">
+            <div class="chat-window">
+                <div id="chat-log">
+                    {% now "d.m.Y" as today_date %}
+                    {% for message in messages %}
+                        <div>
+                            <span class="message-time">
+                                {% if message.timestamp|date:"d.m.Y" == today_date %}
+                                    {{ message.timestamp|date:"H:i" }}
+                                {% else %}
+                                    {{ message.timestamp|date:"d.m.Y" }}
+                                {% endif %}
+                            </span>
+                            <b>{{ message.author.username }}</b>: 
+                            <span>{{ message.content }}</span>
+                        </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
+                <div class="message-input-area">
+                    <input id="chat-message-input" type="text" placeholder="Napište zprávu a stiskněte Enter...">
+                    <button id="chat-message-submit">Odeslat</button>
+                </div>
+            </div>
         </div>
-        
-        <div class="message-input-area">
-            <input id="chat-message-input" type="text" placeholder="Napište zprávu a stiskněte Enter...">
-            <button id="chat-message-submit">Odeslat</button>
-        </div>
+    </div>
+
+    <div id="canvas-view" class="view">
+        <canvas id="drawing-canvas" width="800" height="550"></canvas>
     </div>
 </div>
 
 {{ room_name|json_script:"room-name-json" }}
 
 <script>
+    // --- Základní proměnné ---
     const roomName = JSON.parse(document.getElementById('room-name-json').textContent);
     const chatLog = document.querySelector('#chat-log');
     const messageInput = document.querySelector('#chat-message-input');
-    
     const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
     const chatSocket = new WebSocket(
-        protocol
-        + window.location.host
-        + '/ws/chat/'
-        + roomName
-        + '/'
+        protocol + window.location.host + '/ws/chat/' + roomName + '/'
     );
 
-    // Úprava zde: funkce onmessage teď pracuje i s časem
-    chatSocket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
-        const messageElement = document.createElement('div');
-        
-        // Sestavíme zprávu včetně času, jména a textu
-        messageElement.innerHTML = `
-            <span class="message-time">${data.timestamp}</span>
-            <b>${data.username}</b>: 
-            <span>${data.message}</span>
-        `;
-        
-        chatLog.appendChild(messageElement);
-        chatLog.scrollTop = chatLog.scrollHeight;
-    };
-
-    // Zbytek JavaScriptu zůstává stejný
+    // --- Logika pro textový chat ---
     messageInput.focus();
     messageInput.onkeyup = function(e) {
-        if (e.key === 'Enter') {
-            document.querySelector('#chat-message-submit').click();
-        }
+        if (e.key === 'Enter') { document.querySelector('#chat-message-submit').click(); }
     };
-
     document.querySelector('#chat-message-submit').onclick = function(e) {
         if (messageInput.value.trim() !== '') {
             chatSocket.send(JSON.stringify({
+                'type': 'chat_message', // Explicitně definujeme typ
                 'message': messageInput.value
             }));
             messageInput.value = '';
         }
     };
 
+    // --- Logika pro přepínání pohledů ---
+    const showChatBtn = document.getElementById('show-chat-btn');
+    const showCanvasBtn = document.getElementById('show-canvas-btn');
+    const chatView = document.getElementById('chat-view');
+    const canvasView = document.getElementById('canvas-view');
+
+    showChatBtn.addEventListener('click', () => {
+        chatView.style.display = 'block';
+        canvasView.style.display = 'none';
+        showChatBtn.classList.add('active');
+        showCanvasBtn.classList.remove('active');
+    });
+    showCanvasBtn.addEventListener('click', () => {
+        canvasView.style.display = 'block';
+        chatView.style.display = 'none';
+        showCanvasBtn.classList.add('active');
+        showChatBtn.classList.remove('active');
+    });
+    // Na začátku skryjeme plátno
+    canvasView.style.display = 'none';
+
+    // --- Logika pro kreslení na plátno ---
+    const canvas = document.getElementById('drawing-canvas');
+    const context = canvas.getContext('2d');
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    function draw(x, y, prevX, prevY) {
+        context.strokeStyle = '#000000';
+        context.lineWidth = 3;
+        context.lineJoin = 'round';
+        context.lineCap = 'round';
+        context.beginPath();
+        context.moveTo(prevX, prevY);
+        context.lineTo(x, y);
+        context.stroke();
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+        const currentX = e.offsetX;
+        const currentY = e.offsetY;
+        
+        // Kreslíme lokálně
+        draw(currentX, currentY, lastX, lastY);
+
+        // A posíláme data na server
+        chatSocket.send(JSON.stringify({
+            'type': 'drawing',
+            'x': currentX,
+            'y': currentY,
+            'lastX': lastX,
+            'lastY': lastY
+        }));
+        [lastX, lastY] = [currentX, currentY];
+    });
+
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mouseout', () => isDrawing = false);
+
+    // --- Hlavní funkce pro zpracování zpráv z WebSocketu ---
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+
+        if (data.type === 'chat_message') {
+            const messageElement = document.createElement('div');
+            messageElement.innerHTML = `<span class="message-time">${data.timestamp}</span> <b>${data.username}</b>: <span>${data.message}</span>`;
+            chatLog.appendChild(messageElement);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        } else if (data.type === 'drawing') {
+            // Vykreslíme, co poslal jiný uživatel
+            draw(data.x, data.y, data.lastX, data.lastY);
+        }
+    };
     chatLog.scrollTop = chatLog.scrollHeight;
 </script>
 {% endblock %}

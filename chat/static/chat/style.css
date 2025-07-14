@@ -305,3 +305,33 @@ body {
 #confirm-enter-room:hover:not(:disabled) {
     background-color: #218838;
 }
+
+/* Styly pro přepínání pohledů a plátno */
+.main-view-container {
+    width: 100%;
+    max-width: 840px;
+}
+.view-switcher {
+    margin-bottom: 20px;
+    text-align: center;
+}
+.view-switcher button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    margin: 0 5px;
+    border-radius: 5px;
+}
+.view-switcher button.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+#drawing-canvas {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: crosshair;
+}
