@@ -1,24 +1,27 @@
+# chat/models.py
 from django.db import models
 from django.contrib.auth.models import User
 
-# NOVÝ MODEL PRO MÍSTNOSTI
+# 1. Nejprve definujeme model Room
 class Room(models.Model):
-    name = models.CharField(max_length=255, unique=True) # Jméno místnosti je unikátní
+    name = models.CharField(max_length=255, unique=True)
+    canvas_content = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name
 
-# UPRAVENÝ MODEL PRO ZPRÁVY
+# 2. Až potom definujeme model Message, který na Room odkazuje
 class Message(models.Model):
-    # Propojení s modelem Room. on_delete=models.CASCADE znamená,
-    # že když smažeš místnost, smažou se i všechny její zprávy.
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='messages')
     author = models.ForeignKey(User, related_name='messages', on_delete=models.CASCADE)
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+    is_deleted = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.author.username}: {self.content[:20]}'
 
     class Meta:
         ordering = ['timestamp']
+
+

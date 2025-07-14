@@ -1,6 +1,9 @@
 {% extends 'chat/base.html' %}
+{% load static %}
 
 {% block content %}
+<form style="display:none;">{% csrf_token %}</form>
+
 <div class="main-view-container">
     <div class="view-switcher">
         <button id="show-chat-btn" class="active">Chat</button>
@@ -35,18 +38,21 @@
     </div>
 
     <div id="canvas-view" class="view">
-    <canvas id="drawing-canvas" width="800" height="550"></canvas>
-    <div style="text-align: center; margin-top: 10px;">
-        <button id="clear-canvas-btn" class="logout-button">Vymazat plátno</button>
+        <canvas id="drawing-canvas" width="800" height="550"></canvas>
+        <div style="text-align: center; margin-top: 10px;">
+            <button id="clear-canvas-btn" class="logout-button">Vymazat plátno</button>
+        </div>
     </div>
-</div>
 </div>
 
 {{ room_name|json_script:"room-name-json" }}
+{{ canvas_content|default_if_none:"null"|json_script:"canvas-content-json" }}
+
 
 <script>
     // --- Základní proměnné ---
     const roomName = JSON.parse(document.getElementById('room-name-json').textContent);
+    const initialCanvasContent = JSON.parse(document.getElementById('canvas-content-json').textContent);
     const chatLog = document.querySelector('#chat-log');
     const messageInput = document.querySelector('#chat-message-input');
     const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
@@ -62,7 +68,7 @@
     document.querySelector('#chat-message-submit').onclick = function(e) {
         if (messageInput.value.trim() !== '') {
             chatSocket.send(JSON.stringify({
-                'type': 'chat_message', // Explicitně definujeme typ
+                'type': 'chat_message',
                 'message': messageInput.value
             }));
             messageInput.value = '';
@@ -87,8 +93,7 @@
         showCanvasBtn.classList.add('active');
         showChatBtn.classList.remove('active');
     });
-    // Na začátku skryjeme plátno
-    canvasView.style.display = 'none';
+    canvasView.style.display = 'none'; // Na začátku je plátno skryté
 
     // --- Logika pro kreslení na plátno ---
     const canvas = document.getElementById('drawing-canvas');
@@ -96,6 +101,15 @@
     let isDrawing = false;
     let lastX = 0;
     let lastY = 0;
+
+    // Načtení uložené kresby při startu
+    if (initialCanvasContent) {
+        const image = new Image();
+        image.onload = function() {
+            context.drawImage(image, 0, 0);
+        };
+        image.src = initialCanvasContent;
+    }
 
     function draw(x, y, prevX, prevY) {
         context.strokeStyle = '#000000';
@@ -108,6 +122,19 @@
         context.stroke();
     }
 
+    function saveCanvasState() {
+        const dataURL = canvas.toDataURL();
+        const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+        fetch(`/save-canvas/${roomName}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({'content': dataURL})
+        });
+    }
+
     canvas.addEventListener('mousedown', (e) => {
         isDrawing = true;
         [lastX, lastY] = [e.offsetX, e.offsetY];
@@ -117,23 +144,39 @@
         if (!isDrawing) return;
         const currentX = e.offsetX;
         const currentY = e.offsetY;
-        
-        // Kreslíme lokálně
         draw(currentX, currentY, lastX, lastY);
-
-        // A posíláme data na server
         chatSocket.send(JSON.stringify({
-            'type': 'drawing',
-            'x': currentX,
-            'y': currentY,
-            'lastX': lastX,
-            'lastY': lastY
+            'type': 'drawing', 'x': currentX, 'y': currentY, 'lastX': lastX, 'lastY': lastY
         }));
         [lastX, lastY] = [currentX, currentY];
     });
 
-    canvas.addEventListener('mouseup', () => isDrawing = false);
-    canvas.addEventListener('mouseout', () => isDrawing = false);
+    canvas.addEventListener('mouseup', () => {
+        if (isDrawing) {
+            isDrawing = false;
+            saveCanvasState(); // Uložíme stav po dokreslení
+        }
+    });
+    canvas.addEventListener('mouseout', () => {
+        if (isDrawing) {
+            isDrawing = false;
+            saveCanvasState(); // Uložíme stav i při opuštění plátna
+        }
+    });
+
+    // --- Logika pro mazání plátna ---
+    const clearCanvasBtn = document.getElementById('clear-canvas-btn');
+
+    function clearCanvas() {
+        context.fillStyle = '#FFFFFF';
+        context.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    clearCanvasBtn.addEventListener('click', () => {
+        clearCanvas();
+        saveCanvasState(); // Uložíme i prázdné plátno
+        chatSocket.send(JSON.stringify({'type': 'clear_canvas'}));
+    });
 
     // --- Hlavní funkce pro zpracování zpráv z WebSocketu ---
     chatSocket.onmessage = function(e) {
@@ -145,45 +188,13 @@
             chatLog.appendChild(messageElement);
             chatLog.scrollTop = chatLog.scrollHeight;
         } else if (data.type === 'drawing') {
-            // Vykreslíme, co poslal jiný uživatel
             draw(data.x, data.y, data.lastX, data.lastY);
+        } else if (data.type === 'clear_canvas') {
+            clearCanvas();
         }
     };
-    chatLog.scrollTop = chatLog.scrollHeight;
-
-    // --- Logika pro mazání plátna ---
-const clearCanvasBtn = document.getElementById('clear-canvas-btn');
-
-// Funkce, která vymaže plátno
-function clearCanvas() {
-    context.fillStyle = '#FFFFFF'; // Bílá barva
-    context.fillRect(0, 0, canvas.width, canvas.height);
-}
-
-clearCanvasBtn.addEventListener('click', () => {
-    // Vymažeme lokální plátno
-    clearCanvas();
     
-    // A pošleme příkaz ostatním
-    chatSocket.send(JSON.stringify({
-        'type': 'clear_canvas'
-    }));
-});
-
-// --- Úprava hlavní funkce pro zpracování zpráv ---
-// Původní funkci onmessage musíme upravit
-chatSocket.onmessage = function(e) {
-    const data = JSON.parse(e.data);
-
-    if (data.type === 'chat_message') {
-        // ... kód pro přidání textové zprávy ...
-    } else if (data.type === 'drawing') {
-        // ... kód pro kreslení ...
-    } else if (data.type === 'clear_canvas') {
-        // Zpracujeme příkaz k vymazání
-        clearCanvas();
-    }
-};
-
+    // Poslední se ujistíme, že chat je odscrollovaný dolů
+    chatLog.scrollTop = chatLog.scrollHeight;
 </script>
 {% endblock %}

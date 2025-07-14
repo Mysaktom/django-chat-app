@@ -29,4 +29,6 @@ urlpatterns = [
         ),
         name='password-change-done'
     ),
+    # Cesta pro uložení obsahu plátna
+    path('save-canvas/<str:room_name>/', views.save_canvas, name='save-canvas'),
 ]

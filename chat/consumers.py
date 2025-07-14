@@ -1,3 +1,4 @@
+# chat/consumers.py
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
@@ -5,41 +6,35 @@ from django.utils import timezone
 from .models import Message, Room, User
 
 class ChatConsumer(AsyncWebsocketConsumer):
-    # Metoda volaná při připojení klienta
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = f'chat_{self.room_name}'
-
-        # Připojení k real-time skupině pro danou místnost
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
         await self.accept()
 
-    # Metoda volaná při odpojení klienta
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
 
-    # Metoda volaná při přijetí dat z WebSocketu
+    # Přijme zprávu z WebSocketu a rozhodne, co s ní
     async def receive(self, text_data):
         data = json.loads(text_data)
-        message_type = data.get('type', 'chat_message')
+        message_type = data.get('type', 'chat_message') # Výchozí typ je chat
 
-        # Rozhodne, co dělat podle typu zprávy
         if message_type == 'chat_message':
+            # Zpracování textové zprávy (kód, který už máme)
             message = data['message']
             username = self.scope['user'].username
             new_message = await self.save_message(username, self.room_name, message)
             
-            # Zformátuje čas pro zobrazení
             today = timezone.now().date()
             timestamp_str = new_message.timestamp.strftime('%H:%M' if new_message.timestamp.date() == today else '%d.%m.%Y')
 
-            # Rozešle textovou zprávu všem ve skupině
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -49,48 +44,32 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'timestamp': timestamp_str
                 }
             )
-        elif message_type == 'drawing':
-            # Rozešle data o kreslení všem ve skupině
+        else: # Zpracování kreslení
+            # Rozešleme data o kreslení všem ve skupině, kromě odesílatele
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
                     'type': 'drawing_broadcast',
                     'event': data,
-                    'sender_channel': self.channel_name
-                }
-            )
-        elif message_type == 'clear_canvas':
-            # Rozešle příkaz na vymazání plátna všem ve skupině
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {
-                    'type': 'clear_canvas_broadcast',
-                    'sender_channel': self.channel_name
+                    'sender_channel': self.channel_name # Důležité pro ignorování vlastních zpráv
                 }
             )
 
-    # --- Metody pro rozesílání zpráv zpět klientům ---
-
+    # Metoda pro rozeslání textové zprávy
     async def chat_message_broadcast(self, event):
-        # Pošle textovou zprávu
         await self.send(text_data=json.dumps({
-            'type': 'chat_message',
+            'type': 'chat_message', # Zpět na klienta posíláme jednoduchý typ
             'message': event['message'],
             'username': event['username'],
             'timestamp': event['timestamp']
         }))
 
+    # NOVÁ metoda pro rozeslání dat o kreslení
     async def drawing_broadcast(self, event):
-        # Pošle data o kreslení (ale ne zpět odesílateli, aby se mu to nekreslilo dvakrát)
+        # Pošle data jen ostatním, ne zpět odesílateli
         if self.channel_name != event['sender_channel']:
             await self.send(text_data=json.dumps(event['event']))
 
-    async def clear_canvas_broadcast(self, event):
-        # Pošle příkaz na vymazání (také ne zpět odesílateli)
-        if self.channel_name != event['sender_channel']:
-            await self.send(text_data=json.dumps({'type': 'clear_canvas'}))
-            
-    # --- Pomocná metoda pro uložení zprávy do databáze ---
     @database_sync_to_async
     def save_message(self, username, room_name, message):
         user = User.objects.get(username=username)
