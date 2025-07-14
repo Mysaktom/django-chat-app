@@ -35,8 +35,11 @@
     </div>
 
     <div id="canvas-view" class="view">
-        <canvas id="drawing-canvas" width="800" height="550"></canvas>
+    <canvas id="drawing-canvas" width="800" height="550"></canvas>
+    <div style="text-align: center; margin-top: 10px;">
+        <button id="clear-canvas-btn" class="logout-button">Vymazat plátno</button>
     </div>
+</div>
 </div>
 
 {{ room_name|json_script:"room-name-json" }}
@@ -147,5 +150,40 @@
         }
     };
     chatLog.scrollTop = chatLog.scrollHeight;
+
+    // --- Logika pro mazání plátna ---
+const clearCanvasBtn = document.getElementById('clear-canvas-btn');
+
+// Funkce, která vymaže plátno
+function clearCanvas() {
+    context.fillStyle = '#FFFFFF'; // Bílá barva
+    context.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+clearCanvasBtn.addEventListener('click', () => {
+    // Vymažeme lokální plátno
+    clearCanvas();
+    
+    // A pošleme příkaz ostatním
+    chatSocket.send(JSON.stringify({
+        'type': 'clear_canvas'
+    }));
+});
+
+// --- Úprava hlavní funkce pro zpracování zpráv ---
+// Původní funkci onmessage musíme upravit
+chatSocket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+
+    if (data.type === 'chat_message') {
+        // ... kód pro přidání textové zprávy ...
+    } else if (data.type === 'drawing') {
+        // ... kód pro kreslení ...
+    } else if (data.type === 'clear_canvas') {
+        // Zpracujeme příkaz k vymazání
+        clearCanvas();
+    }
+};
+
 </script>
 {% endblock %}
