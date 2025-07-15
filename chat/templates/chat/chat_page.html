@@ -11,42 +11,50 @@
     </div>
 
     <div id="chat-view" class="view active">
-        <div class="chat-container">
-            <div class="chat-window">
-                <div id="chat-log">
-                    {% now "d.m.Y" as today_date %}
-                    {% for message in messages %}
-                        <div>
-                            <span class="message-time">
-                                {% if message.timestamp|date:"d.m.Y" == today_date %}
-                                    {{ message.timestamp|date:"H:i" }}
-                                {% else %}
-                                    {{ message.timestamp|date:"d.m.Y" }}
-                                {% endif %}
-                            </span>
-                            <b>{{ message.author.username }}</b>: 
-                            <span>{{ message.content }}</span>
-                        </div>
-                    {% endfor %}
+        <div class="chat-layout">
+            <div class="chat-container">
+                <div class="chat-window">
+                    <div id="chat-log">
+                        {% now "d.m.Y" as today_date %}
+                        {% for message in messages %}
+                            <div>
+                                <span class="message-time">
+                                    {% if message.timestamp|date:"d.m.Y" == today_date %}{{ message.timestamp|date:"H:i" }}{% else %}{{ message.timestamp|date:"d.m.Y" }}{% endif %}
+                                </span>
+                                <b>{{ message.author.username }}</b>: 
+                                <span>{{ message.content }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div id="typing-indicator"></div>
+                    <div class="message-input-area">
+                        <input id="chat-message-input" type="text" placeholder="Napište zprávu a stiskněte Enter...">
+                        <button id="chat-message-submit" class="btn-action">Odeslat</button>
+                    </div>
                 </div>
-                <div class="message-input-area">
-                    <input id="chat-message-input" type="text" placeholder="Napište zprávu a stiskněte Enter...">
-                    <button id="chat-message-submit">Odeslat</button>
-                </div>
+            </div>
+            <div id="user-list-panel">
+                <h4>Online v místnosti</h4>
+                <ul id="user-list">
+                    </ul>
             </div>
         </div>
     </div>
 
     <div id="canvas-view" class="view">
-    <canvas id="drawing-canvas" width="800" height="550"></canvas>
-    <div style="text-align: center; margin-top: 10px;">
-        <button id="undo-canvas-btn" class="logout-button" style="background-color: #ffc107b4; color: black;">Zpět</button>
-        <button id="clear-canvas-btn" class="logout-button">Vyčistit plátno</button>
+        <div id="canvas-wrapper">
+            <canvas id="drawing-canvas" width="800" height="550"></canvas>
+        </div>
+        <div style="text-align: center; margin-top: 10px;">
+            <button id="undo-canvas-btn" class="logout-button" style="background-color: #ffc107; color: black;">Zpět</button>
+            <button id="clear-canvas-btn" class="logout-button">Vymazat plátno</button>
+        </div>
     </div>
 </div>
 
 {{ room_name|json_script:"room-name-json" }}
 {{ canvas_content|default_if_none:"null"|json_script:"canvas-content-json" }}
+{{ user.username|json_script:"current-user-json" }}
 <script>
     // --- Základní proměnné ---
     const roomName = JSON.parse(document.getElementById('room-name-json').textContent);
