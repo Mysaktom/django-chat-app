@@ -13,8 +13,6 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     margin: 0;
     padding: 0;
-    /* TOTO ZPŮSOBOVALO PROBLÉM - SMAZÁNO */
-    /* overflow: hidden; */
 }
 
 /* --- Hlavní obsah pro stránky s navigací --- */
@@ -24,7 +22,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding: 40px 20px;
+    padding: 20px;
     height: calc(100vh - 60px); 
 }
 
@@ -66,8 +64,12 @@ body {
 }
 .nav-room-name {
     color: #a0a0a0;
-    border-right: 1px solid #555;
-    padding-right: 20px;
+}
+#online-user-count {
+    color: #a0a0a0;
+    border-left: 1px solid #555;
+    padding-left: 20px;
+    margin-left: -10px; /* Optické zarovnání */
 }
 .nav-user .nav-link {
     color: #ccc;
@@ -198,7 +200,7 @@ body {
 /* --- Kontejner pro přepínání pohledů a chat --- */
 .main-view-container {
     width: 100%;
-    max-width: 840px;
+    max-width: 1100px; /* Zvětšíme prostor pro postranní panel */
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -226,15 +228,20 @@ body {
     width: 100%;
     flex-grow: 1;
     display: flex;
-    flex-direction: column;
-    /* Důležité pro vnitřní scrollování */
-    min-height: 0; 
+    min-height: 0;
+}
+
+/* ROZLOŽENÍ PRO CHAT A POSTrannÍ PANEL */
+.chat-layout {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    height: 100%;
 }
 
 /* --- Chatovací okno --- */
 .chat-container {
-    width: 100%;
-    height: 100%;
+    flex-grow: 1; /* Chat zabere většinu místa */
     background-color: #fff;
     border: 1px solid #ddd;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -257,7 +264,7 @@ body {
     font-size: 14px;
     line-height: 1.6;
     background-color: #fdfdfd;
-    overflow-y: auto; /* TOTO ZAJIŠŤUJE SCROLLBAR JEN PRO CHAT */
+    overflow-y: auto;
     margin-bottom: 15px;
     border-radius: 4px;
 }
@@ -293,29 +300,71 @@ body {
     background-color: #218838;
 }
 
-/* Styl pro časové razítko u zprávy */
-.message-time {
-    color: #999;
-    font-size: 12px;
-    margin-right: 8px;
+/* --- Postranní panel s online uživateli --- */
+#user-list-panel {
+    flex-shrink: 0;
+    width: 240px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    height: 100%;
+    overflow-y: auto;
+}
+#user-list-panel h4 {
+    margin-top: 0;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+}
+#user-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+#user-list li {
+    padding: 8px 5px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Styl pro indikátor psaní */
+#typing-indicator {
+    height: 20px;
+    color: #888;
+    font-style: italic;
+    font-size: 13px;
+    padding-left: 5px;
 }
 
 /* --- Plátno --- */
+#canvas-wrapper {
+    position: relative;
+    align-self: center;
+}
 #drawing-canvas {
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
     cursor: crosshair;
-    align-self: center;
+}
+.remote-cursor {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: red;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    color: red;
+    font-size: 12px;
+    padding-left: 12px;
+    white-space: nowrap;
 }
 
 /* --- Modální okno s pravidly --- */
 .modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     background-color: rgba(0,0,0,0.6);
     display: none;
     justify-content: center;
@@ -356,20 +405,4 @@ body {
 }
 #confirm-enter-room:hover:not(:disabled) {
     background-color: #218838;
-}
-
-/* Styl pro počítadlo online uživatelů v navigaci */
-#online-user-count {
-    color: #a0a0a0;
-    border-right: 1px solid #555;
-    padding-right: 20px;
-}
-
-/* Styl pro indikátor psaní */
-#typing-indicator {
-    height: 20px;
-    color: #888;
-    font-style: italic;
-    font-size: 13px;
-    padding-left: 5px;
 }
