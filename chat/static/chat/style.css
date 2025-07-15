@@ -13,17 +13,19 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     margin: 0;
     padding: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* --- Hlavní obsah pro stránky s navigací --- */
 .main-content {
-    margin-top: 60px; /* Výška navigační lišty */
-    width: 100%;
+    flex-grow: 1; /* Zajistí, že obsah zabere všechen dostupný prostor */
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding: 20px;
-    height: calc(100vh - 60px); 
+    padding: 40px 20px;
+    overflow-y: auto; /* Povolí scrollování obsahu, pokud je větší než obrazovka */
 }
 
 /* Speciální styl pro centrování stránek bez navigace (přihlášení) */
@@ -37,9 +39,7 @@ body {
 
 /* --- Navigační lišta --- */
 .main-nav {
-    position: fixed;
-    top: 0;
-    left: 0;
+    flex-shrink: 0; /* Navigace se nebude zmenšovat */
     width: 100%;
     background-color: #343a40;
     color: white;
@@ -69,7 +69,7 @@ body {
     color: #a0a0a0;
     border-left: 1px solid #555;
     padding-left: 20px;
-    margin-left: -10px; /* Optické zarovnání */
+    margin-left: -10px;
 }
 .nav-user .nav-link {
     color: #ccc;
@@ -200,8 +200,9 @@ body {
 /* --- Kontejner pro přepínání pohledů a chat --- */
 .main-view-container {
     width: 100%;
-    max-width: 1100px; /* Zvětšíme prostor pro postranní panel */
-    height: 100%;
+    max-width: 1100px;
+    /* Oprava: Výška se přizpůsobí obsahu v .main-content */
+    height: 100%; 
     display: flex;
     flex-direction: column;
 }
@@ -231,7 +232,7 @@ body {
     min-height: 0;
 }
 
-/* ROZLOŽENÍ PRO CHAT A POSTrannÍ PANEL */
+/* ROZLOŽENÍ PRO CHAT A POSTRANNÍ PANEL */
 .chat-layout {
     display: flex;
     gap: 20px;
@@ -241,13 +242,14 @@ body {
 
 /* --- Chatovací okno --- */
 .chat-container {
-    flex-grow: 1; /* Chat zabere většinu místa */
+    flex-grow: 1;
     background-color: #fff;
     border: 1px solid #ddd;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     border-radius: 8px;
     display: flex;
     flex-direction: column;
+    height: 100%; /* Důležité pro vnitřní scrollování */
 }
 .chat-window {
     padding: 20px;
@@ -264,7 +266,7 @@ body {
     font-size: 14px;
     line-height: 1.6;
     background-color: #fdfdfd;
-    overflow-y: auto;
+    overflow-y: auto; /* TOTO ZAJIŠŤUJE SCROLLBAR JEN PRO CHAT */
     margin-bottom: 15px;
     border-radius: 4px;
 }
