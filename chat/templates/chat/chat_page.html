@@ -4,7 +4,7 @@
 {% block content %}
 <form style="display:none;">{% csrf_token %}</form>
 
-<div class="main-view-container">
+< class="main-view-container">
     <div class="view-switcher">
         <button id="show-chat-btn" class="active">Chat</button>
         <button id="show-canvas-btn">Plátno</button>
@@ -41,16 +41,14 @@
             <canvas id="drawing-canvas" width="800" height="550"></canvas>
         </div>
         <div class="main-view-container">
-            
-        <div id="canvas-view" class="view">
-            <canvas id="drawing-canvas" ...></canvas>
-            <div style="text-align: center; margin-top: 10px;">
-                <button id="undo-canvas-btn" ...>Zpět</button>
-                <button id="clear-canvas-btn" ...>Vymazat plátno</button>
+            <div id="canvas-view" class="view">
+                <canvas id="drawing-canvas" ...></canvas>
+                <div style="text-align: center; margin-top: 10px;">
+                    <button id="undo-canvas-btn" ...>Zpět</button>
+                    <button id="clear-canvas-btn" ...>Vymazat plátno</button>
+                </div>
             </div>
         </div>
-    </div>
-</div>
     </div>
 </div>
 
