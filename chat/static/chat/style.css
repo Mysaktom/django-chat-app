@@ -13,8 +13,6 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     margin: 0;
     padding: 0;
-    /* Zabráníme scrollování celé stránky */
-    overflow: hidden;
 }
 
 /* --- Hlavní obsah pro stránky s navigací --- */
