@@ -13,17 +13,19 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     margin: 0;
     padding: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* --- Hlavní obsah pro stránky s navigací --- */
 .main-content {
-    margin-top: 60px; /* Výška navigační lišty */
-    width: 100%;
+    flex-grow: 1; /* Zajistí, že obsah zabere všechen dostupný prostor */
     display: flex;
     justify-content: center;
     align-items: flex-start;
     padding: 40px 20px;
-    height: calc(100vh - 60px); 
+    overflow-y: auto; /* Povolí scrollování obsahu, pokud je větší než obrazovka */
 }
 
 /* Speciální styl pro centrování stránek bez navigace (přihlášení) */
@@ -37,9 +39,7 @@ body {
 
 /* --- Navigační lišta --- */
 .main-nav {
-    position: fixed;
-    top: 0;
-    left: 0;
+    flex-shrink: 0; /* Navigace se nebude zmenšovat */
     width: 100%;
     background-color: #343a40;
     color: white;
@@ -197,10 +197,10 @@ body {
     background-color: #0056b3;
 }
 
-/* --- Kontejner pro přepínání pohledů a chat --- */
 .main-view-container {
+    /* TOTO JE KLÍČOVÁ ZMĚNA */
     width: 100%;
-    max-width: 1100px;
+    max-width: 1100px; 
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -228,14 +228,7 @@ body {
     width: 100%;
     flex-grow: 1;
     display: flex;
-    flex-direction: column;
     min-height: 0;
-}
-
-/* ZDE JE KLÍČOVÁ OPRAVA: Pravidlo pro vycentrování plátna */
-#canvas-view {
-    justify-content: center; /* Zarovná obsah vertikálně (protože flex-direction je column) */
-    align-items: center;     /* Zarovná obsah horizontálně */
 }
 
 /* ROZLOŽENÍ PRO CHAT A POSTRANNÍ PANEL */
@@ -244,6 +237,7 @@ body {
     gap: 20px;
     width: 100%;
     height: 100%;
+    min-height: 0; /* Oprava pro flexbox v některých prohlížečích */
 }
 
 /* --- Chatovací okno --- */
@@ -255,7 +249,8 @@ body {
     border-radius: 8px;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    min-width: 0; /* Oprava pro flexbox */
+    height: 100%; /* Důležité pro vnitřní scrollování */
 }
 .chat-window {
     padding: 20px;
@@ -272,7 +267,7 @@ body {
     font-size: 14px;
     line-height: 1.6;
     background-color: #fdfdfd;
-    overflow-y: auto;
+    overflow-y: auto; /* TOTO ZAJIŠŤUJE SCROLLBAR JEN PRO CHAT */
     margin-bottom: 15px;
     border-radius: 4px;
 }
@@ -346,7 +341,7 @@ body {
 /* --- Plátno --- */
 #canvas-wrapper {
     position: relative;
-    /* align-self: center; už není potřeba, řeší to rodič #canvas-view */
+    align-self: center;
 }
 #drawing-canvas {
     background-color: #fff;
