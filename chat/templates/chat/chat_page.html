@@ -47,8 +47,6 @@
 
 {{ room_name|json_script:"room-name-json" }}
 {{ canvas_content|default_if_none:"null"|json_script:"canvas-content-json" }}
-
-
 <script>
     // --- Základní proměnné ---
     const roomName = JSON.parse(document.getElementById('room-name-json').textContent);
@@ -93,7 +91,7 @@
         showCanvasBtn.classList.add('active');
         showChatBtn.classList.remove('active');
     });
-    canvasView.style.display = 'none'; // Na začátku je plátno skryté
+    canvasView.style.display = 'none';
 
     // --- Logika pro kreslení na plátno ---
     const canvas = document.getElementById('drawing-canvas');
@@ -124,6 +122,7 @@
 
     function saveCanvasState() {
         const dataURL = canvas.toDataURL();
+        // Ujistíme se, že máme CSRF token
         const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
         fetch(`/save-canvas/${roomName}/`, {
             method: 'POST',
@@ -154,31 +153,29 @@
     canvas.addEventListener('mouseup', () => {
         if (isDrawing) {
             isDrawing = false;
-            saveCanvasState(); // Uložíme stav po dokreslení
+            saveCanvasState();
         }
     });
     canvas.addEventListener('mouseout', () => {
         if (isDrawing) {
             isDrawing = false;
-            saveCanvasState(); // Uložíme stav i při opuštění plátna
+            saveCanvasState();
         }
     });
 
     // --- Logika pro mazání plátna ---
     const clearCanvasBtn = document.getElementById('clear-canvas-btn');
-
     function clearCanvas() {
         context.fillStyle = '#FFFFFF';
         context.fillRect(0, 0, canvas.width, canvas.height);
     }
-
     clearCanvasBtn.addEventListener('click', () => {
         clearCanvas();
-        saveCanvasState(); // Uložíme i prázdné plátno
+        saveCanvasState();
         chatSocket.send(JSON.stringify({'type': 'clear_canvas'}));
     });
 
-    // --- Hlavní funkce pro zpracování zpráv z WebSocketu ---
+    // --- Hlavní funkce pro zpracování VŠECH zpráv z WebSocketu (OPRAVENO) ---
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
 
@@ -194,7 +191,6 @@
         }
     };
     
-    // Poslední se ujistíme, že chat je odscrollovaný dolů
     chatLog.scrollTop = chatLog.scrollHeight;
 </script>
 {% endblock %}
