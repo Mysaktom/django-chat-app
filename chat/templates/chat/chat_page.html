@@ -33,11 +33,6 @@
                     </div>
                 </div>
             </div>
-            <div id="user-list-panel">
-                <h4>Online v místnosti</h4>
-                <ul id="user-list">
-                    </ul>
-            </div>
         </div>
     </div>
 
@@ -182,49 +177,63 @@
     const typingIndicator = document.getElementById('typing-indicator');
 
     chatSocket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
+    const data = JSON.parse(e.data);
 
-        switch(data.type) {
-            case 'chat_message':
-                const messageElement = document.createElement('div');
-                messageElement.innerHTML = `<span class="message-time">${data.timestamp}</span> <b>${data.username}</b>: <span>${data.message}</span>`;
-                chatLog.appendChild(messageElement);
-                chatLog.scrollTop = chatLog.scrollHeight;
-                break;
+    switch(data.type) {
+        case 'chat_message':
+            // Přidá novou textovou zprávu do chatu
+            const messageElement = document.createElement('div');
+            messageElement.innerHTML = `<span class="message-time">${data.timestamp}</span> <b>${data.username}</b>: <span>${data.message}</span>`;
+            chatLog.appendChild(messageElement);
+            chatLog.scrollTop = chatLog.scrollHeight;
+            break;
 
-            case 'user_list_update':
-                const userList = document.getElementById('user-list');
-                userList.innerHTML = '';
-                data.users.forEach(user => {
-                    const userElement = document.createElement('li');
-                    userElement.textContent = user;
-                    if (user === currentUsername) {
-                        userElement.style.fontWeight = 'bold';
-                    }
-                    userList.appendChild(userElement);
-                });
-                break;
+        case 'user_list_update':
+            // TOTO JE UPRAVENÁ ČÁST: Najde prvek v navigaci a aktualizuje počet
+            const userCountSpan = document.getElementById('online-user-count');
+            const userCount = data.users.length;
+            
+            if (userCountSpan) {
+                userCountSpan.innerHTML = `👤 ${userCount}`;
+                userCountSpan.style.display = 'inline';
+            }
+            break;
 
-            case 'typing_indicator':
-                if (typingUsers.has(data.username)) clearTimeout(typingUsers.get(data.username));
-                const timer = setTimeout(() => {
-                    typingUsers.delete(data.username);
-                    updateTypingIndicator();
-                }, 2000);
-                typingUsers.set(data.username, timer);
+        case 'typing_indicator':
+            // Zobrazí, kdo právě píše
+            if (typingUsers.has(data.username)) {
+                clearTimeout(typingUsers.get(data.username));
+            }
+            const timer = setTimeout(() => {
+                typingUsers.delete(data.username);
                 updateTypingIndicator();
-                break;
+            }, 2000); // Indikátor zmizí po 2 sekundách nečinnosti
+            typingUsers.set(data.username, timer);
+            updateTypingIndicator();
+            break;
 
-            case 'drawing':
-                draw(data.x, data.y, data.lastX, data.lastY);
-                break;
-
-            case 'clear_canvas':
+        case 'drawing':
+            // Vykreslí tah od jiného uživatele
+            draw(data.x, data.y, data.lastX, data.lastY);
+            break;
+            
+        case 'clear_canvas':
+            // Vymaže plátno na příkaz od jiného uživatele
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            saveHistory();
+            break;
+        
+        case 'force_redraw':
+            // Překreslí plátno na stav, který přišel ze serveru (po "undo")
+            const image = new Image();
+            image.onload = function() {
                 context.clearRect(0, 0, canvas.width, canvas.height);
-                saveHistory();
-                break;
-        }
-    };
+                context.drawImage(image, 0, 0);
+            };
+            image.src = data.content;
+            break;
+    }
+};
 
     function updateTypingIndicator() {
         const users = Array.from(typingUsers.keys());

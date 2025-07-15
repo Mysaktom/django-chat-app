@@ -357,3 +357,19 @@ body {
 #confirm-enter-room:hover:not(:disabled) {
     background-color: #218838;
 }
+
+/* Styl pro počítadlo online uživatelů v navigaci */
+#online-user-count {
+    color: #a0a0a0;
+    border-right: 1px solid #555;
+    padding-right: 20px;
+}
+
+/* Styl pro indikátor psaní */
+#typing-indicator {
+    height: 20px;
+    color: #888;
+    font-style: italic;
+    font-size: 13px;
+    padding-left: 5px;
+}
