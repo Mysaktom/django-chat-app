@@ -1,6 +1,7 @@
-/* Univerzální pravidlo pro lepší počítání velikostí */
+/* Univerzální pravidlo pro lepší počítání velikostí a plynulé scrollování */
 html {
     box-sizing: border-box;
+    scroll-behavior: smooth;
 }
 *, *:before, *:after {
     box-sizing: inherit;
@@ -12,24 +13,21 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     margin: 0;
     padding: 0;
-    /* Důležité: Tělo stránky je flex kontejner, který zabírá celou výšku */
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
 }
 
 /* --- Hlavní obsah pro stránky s navigací --- */
 .main-content {
-    /* Obsah zabere všechen zbývající prostor po navigaci */
-    flex-grow: 1;
+    margin-top: 60px; /* Výška navigační lišty */
+    width: 100%;
     display: flex;
     justify-content: center;
-    align-items: center; /* Vycentruje obsah na menších obrazovkách */
-    padding: 20px;
-    overflow-y: auto; /* Povolí scrollování, pokud je obsah větší */
+    align-items: flex-start;
+    padding: 40px 20px;
+    /* Zajistí, že obsah vyplní zbytek obrazovky */
+    height: calc(100vh - 60px); 
 }
 
-/* Speciální styl pro centrování stránek bez navigace */
+/* Speciální styl pro centrování stránek bez navigace (přihlášení) */
 .standalone-page-body {
     display: flex;
     justify-content: center;
@@ -40,7 +38,9 @@ body {
 
 /* --- Navigační lišta --- */
 .main-nav {
-    flex-shrink: 0; /* Navigace se nikdy nezmenší */
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     background-color: #343a40;
     color: white;
@@ -65,16 +65,16 @@ body {
 }
 .nav-room-name {
     color: #a0a0a0;
-}
-#online-user-count {
-    color: #a0a0a0;
-    border-left: 1px solid #555;
-    padding-left: 20px;
-    margin-left: -10px;
+    border-right: 1px solid #555;
+    padding-right: 20px;
 }
 .nav-user .nav-link {
     color: #ccc;
     text-decoration: none;
+    transition: color 0.2s;
+}
+.nav-user .nav-link:hover {
+    color: white;
 }
 .logout-form { margin: 0; }
 .logout-button {
@@ -86,9 +86,13 @@ body {
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
+    transition: background-color 0.2s;
+}
+.logout-button:hover {
+    background-color: #b83241;
 }
 
-/* --- Kontejnery pro formuláře --- */
+/* --- Kontejnery pro formuláře (Login, Room Selection, atd.) --- */
 .form-container {
     width: 100%;
     max-width: 500px;
@@ -98,13 +102,102 @@ body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     text-align: center;
 }
-/* ... zbytek stylů pro formuláře (zůstává stejný) ... */
+.form-container h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #333;
+}
+.form-container p {
+    color: #666;
+    margin-bottom: 30px;
+}
+.form-container form p {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    margin-bottom: 15px;
+}
+.form-container form label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+.form-container input[type="text"],
+.form-container input[type="password"],
+.form-container input[type="email"] {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-container input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+.form-container button {
+    width: 100%;
+    padding: 12px 20px;
+    border: none;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+.form-container .input-group {
+    display: flex;
+    gap: 10px;
+}
+.form-container .input-group input { flex-grow: 1; }
+.form-container .btn-login { background-color: #d73a49; }
+.form-container .btn-login:hover { background-color: #b83241; }
+.form-container .btn-action { background-color: #28a745; }
+.form-container .btn-action:hover { background-color: #218838; }
+
+/* --- Chybová hláška --- */
+.errorlist {
+    list-style-type: none;
+    padding: 10px;
+    margin: 0 0 20px 0;
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* --- Seznam místností --- */
+.room-list {
+    margin-top: 40px;
+    border-top: 1px solid #eee;
+    padding-top: 30px;
+}
+.room-list h3 {
+    margin-top: 0;
+    color: #444;
+}
+.room-list a {
+    display: inline-block;
+    margin: 5px;
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 20px;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+.room-list a:hover {
+    background-color: #0056b3;
+}
 
 /* --- Kontejner pro přepínání pohledů a chat --- */
 .main-view-container {
     width: 100%;
-    max-width: 1100px;
-    /* Důležité: Výška je 100% rodiče (.main-content) */
+    max-width: 840px;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -131,29 +224,20 @@ body {
 .view {
     width: 100%;
     flex-grow: 1;
-    display: flex;
-    /* Důležité, aby se vnitřní prvky správně roztahovaly */
-    min-height: 0; 
-}
-
-/* --- ROZLOŽENÍ PRO CHAT A POSTRANNÍ PANEL --- */
-.chat-layout {
-    display: flex;
-    gap: 20px;
-    width: 100%;
-    height: 100%;
+    display: flex; /* Pro centrování plátna a chatu */
+    flex-direction: column;
 }
 
 /* --- Chatovací okno --- */
 .chat-container {
-    flex-grow: 1;
+    width: 100%;
+    height: 100%;
     background-color: #fff;
     border: 1px solid #ddd;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     border-radius: 8px;
     display: flex;
     flex-direction: column;
-    /* Důležité, aby se vnitřní prvky správně roztahovaly */
-    min-height: 0;
 }
 .chat-window {
     padding: 20px;
@@ -167,7 +251,10 @@ body {
     border: 1px solid #eee;
     padding: 15px;
     font-family: monospace;
-    overflow-y: auto; /* ZAJIŠŤUJE SCROLLBAR JEN PRO CHAT */
+    font-size: 14px;
+    line-height: 1.6;
+    background-color: #fdfdfd;
+    overflow-y: auto;
     margin-bottom: 15px;
     border-radius: 4px;
 }
@@ -176,55 +263,56 @@ body {
     gap: 10px;
     flex-shrink: 0;
 }
-/* ... zbytek stylů pro chat ... */
-
-/* --- Postranní panel s online uživateli --- */
-#user-list-panel {
-    flex-shrink: 0;
-    width: 240px;
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    height: 100%;
-    overflow-y: auto;
+#chat-message-input {
+    flex-grow: 1;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
-/* ... zbytek stylů pro seznam uživatelů ... */
+#chat-message-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+#chat-message-submit {
+    padding: 12px 20px;
+    border: none;
+    background-color: #28a745;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+#chat-message-submit:hover {
+    background-color: #218838;
+}
+
+/* Styl pro časové razítko u zprávy */
+.message-time {
+    color: #999;
+    font-size: 12px;
+    margin-right: 8px;
+}
 
 /* --- Plátno --- */
-#canvas-view {
-    justify-content: center;
-    align-items: center;
-}
-#canvas-wrapper {
-    position: relative;
-}
 #drawing-canvas {
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
     cursor: crosshair;
-}
-/* ... zbytek stylů pro plátno ... */
-.remote-cursor {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background-color: red;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    color: red;
-    font-size: 12px;
-    padding-left: 12px;
-    white-space: nowrap;
+    align-self: center; /* Vycentruje plátno v kontejneru */
 }
 
 /* --- Modální okno s pravidly --- */
 .modal-overlay {
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background-color: rgba(0,0,0,0.6);
     display: none;
     justify-content: center;

@@ -11,123 +11,116 @@
     </div>
 
     <div id="chat-view" class="view active">
-        <div class="chat-layout">
-            <div class="chat-container">
-                <div class="chat-window">
-                    <div id="chat-log">
-                        {% now "d.m.Y" as today_date %}
-                        {% for message in messages %}
-                            <div>
-                                <span class="message-time">
-                                    {% if message.timestamp|date:"d.m.Y" == today_date %}{{ message.timestamp|date:"H:i" }}{% else %}{{ message.timestamp|date:"d.m.Y" }}{% endif %}
-                                </span>
-                                <b>{{ message.author.username }}</b>:
-                                <span>{{ message.content }}</span>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <div id="typing-indicator"></div>
-                    <div class="message-input-area">
-                        <input id="chat-message-input" type="text" placeholder="Napište zprávu a stiskněte Enter...">
-                        <button id="chat-message-submit" class="btn-action">Odeslat</button>
-                    </div>
+        <div class="chat-container">
+            <div class="chat-window">
+                <div id="chat-log">
+                    {% now "d.m.Y" as today_date %}
+                    {% for message in messages %}
+                        <div>
+                            <span class="message-time">
+                                {% if message.timestamp|date:"d.m.Y" == today_date %}
+                                    {{ message.timestamp|date:"H:i" }}
+                                {% else %}
+                                    {{ message.timestamp|date:"d.m.Y" }}
+                                {% endif %}
+                            </span>
+                            <b>{{ message.author.username }}</b>: 
+                            <span>{{ message.content }}</span>
+                        </div>
+                    {% endfor %}
                 </div>
-            </div>
-            <div id="user-list-panel">
-                <h4>Online v místnosti</h4>
-                <ul id="user-list">
-                    </ul>
+                <div class="message-input-area">
+                    <input id="chat-message-input" type="text" placeholder="Napište zprávu a stiskněte Enter...">
+                    <button id="chat-message-submit">Odeslat</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="canvas-view" class="view">
-        <div id="canvas-wrapper">
-            <canvas id="drawing-canvas" width="800" height="550"></canvas>
-        </div>
-        <div style="text-align: center; margin-top: 10px;">
-            <button id="undo-canvas-btn" class="logout-button" style="background-color: #ffc107; color: black;">Zpět</button>
-            <button id="clear-canvas-btn" class="logout-button">Vymazat plátno</button>
-        </div>
+    <canvas id="drawing-canvas" width="800" height="550"></canvas>
+    <div style="text-align: center; margin-top: 10px;">
+        <button id="undo-canvas-btn" class="logout-button" style="background-color: #ffc107b4; color: black;">Zpět</button>
+        <button id="clear-canvas-btn" class="logout-button">Vyčistit plátno</button>
     </div>
 </div>
 
 {{ room_name|json_script:"room-name-json" }}
 {{ canvas_content|default_if_none:"null"|json_script:"canvas-content-json" }}
-{{ user.username|json_script:"current-user-json" }}
-
 <script>
-    // --- ZÁKLADNÍ PROMĚNNÉ ---
+    // --- Základní proměnné ---
     const roomName = JSON.parse(document.getElementById('room-name-json').textContent);
-    const currentUsername = JSON.parse(document.getElementById('current-user-json').textContent);
     const initialCanvasContent = JSON.parse(document.getElementById('canvas-content-json').textContent);
-    
-    // Elementy stránky
     const chatLog = document.querySelector('#chat-log');
     const messageInput = document.querySelector('#chat-message-input');
-    const canvas = document.getElementById('drawing-canvas');
-    const context = canvas.getContext('2d');
-
-    // WebSocket připojení
     const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
     const chatSocket = new WebSocket(
         protocol + window.location.host + '/ws/chat/' + roomName + '/'
     );
 
-    // --- LOGIKA PRO TEXTOVÝ CHAT ---
+    // --- Logika pro textový chat ---
     messageInput.focus();
-    document.querySelector('#chat-message-submit').onclick = function(e) {
-        if (messageInput.value.trim() !== '') {
-            chatSocket.send(JSON.stringify({'type': 'chat_message', 'message': messageInput.value}));
-            messageInput.value = '';
-        }
-    };
     messageInput.onkeyup = function(e) {
         if (e.key === 'Enter') { document.querySelector('#chat-message-submit').click(); }
     };
+    document.querySelector('#chat-message-submit').onclick = function(e) {
+        if (messageInput.value.trim() !== '') {
+            chatSocket.send(JSON.stringify({
+                'type': 'chat_message', 'message': messageInput.value
+            }));
+            messageInput.value = '';
+        }
+    };
 
-    // --- LOGIKA PRO INDIKÁTOR PSANÍ ---
-    let typingTimer;
-    messageInput.addEventListener('input', () => {
-        clearTimeout(typingTimer);
-        chatSocket.send(JSON.stringify({'type': 'typing_started'}));
-    });
-
-    // --- LOGIKA PRO PŘEPÍNÁNÍ POHLEDŮ ---
+    // --- Logika pro přepínání pohledů ---
     const showChatBtn = document.getElementById('show-chat-btn');
     const showCanvasBtn = document.getElementById('show-canvas-btn');
     const chatView = document.getElementById('chat-view');
     const canvasView = document.getElementById('canvas-view');
 
     showChatBtn.addEventListener('click', () => {
-        chatView.style.display = 'block';
-        canvasView.style.display = 'none';
-        showChatBtn.classList.add('active');
-        showCanvasBtn.classList.remove('active');
+        chatView.style.display = 'block'; canvasView.style.display = 'none';
+        showChatBtn.classList.add('active'); showCanvasBtn.classList.remove('active');
     });
     showCanvasBtn.addEventListener('click', () => {
-        canvasView.style.display = 'block';
-        chatView.style.display = 'none';
-        showCanvasBtn.classList.add('active');
-        showChatBtn.classList.remove('active');
+        canvasView.style.display = 'block'; chatView.style.display = 'none';
+        showCanvasBtn.classList.add('active'); showChatBtn.classList.remove('active');
     });
     canvasView.style.display = 'none';
 
-    // --- LOGIKA PRO KRESLENÍ NA PLÁTNO ---
-    let isDrawing = false, lastX = 0, lastY = 0;
-    let history = [], historyStep = -1;
+    // --- Logika pro kreslení na plátno ---
+    const canvas = document.getElementById('drawing-canvas');
+    const context = canvas.getContext('2d');
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
 
+    // NOVINKA: Historie pro funkci Zpět
+    let history = [];
+    let historyStep = -1;
+
+    // Funkce pro uložení aktuálního stavu do historie
     function saveHistory() {
-        if (historyStep < history.length - 1) { history.splice(historyStep + 1); }
+        // Pokud jsme se v historii vrátili, smažeme všechny budoucí kroky
+        if (historyStep < history.length - 1) {
+            history.splice(historyStep + 1);
+        }
         history.push(canvas.toDataURL());
         historyStep++;
     }
-    
+
+    // Načtení uložené kresby při startu
     if (initialCanvasContent) {
         const image = new Image();
-        image.onload = () => { context.drawImage(image, 0, 0); saveHistory(); };
+        image.onload = function() {
+            context.drawImage(image, 0, 0);
+            saveHistory(); // Uložíme počáteční stav jako první krok historie
+        };
         image.src = initialCanvasContent;
-    } else { saveHistory(); }
+    } else {
+        saveHistory(); // Uložíme prázdné plátno jako první krok
+    }
+
 
     function draw(x, y, prevX, prevY) {
         context.strokeStyle = '#000000'; context.lineWidth = 3;
@@ -146,117 +139,92 @@
         });
     }
 
-    canvas.addEventListener('mousedown', (e) => { isDrawing = true; [lastX, lastY] = [e.offsetX, e.offsetY]; });
-    canvas.addEventListener('mouseup', () => { if (isDrawing) { isDrawing = false; saveHistory(); saveCanvasState(); } });
-    canvas.addEventListener('mouseout', () => { if (isDrawing) { isDrawing = false; saveCanvasState(); } });
-    canvas.addEventListener('mousemove', (e) => {
-        if (isDrawing) {
-            draw(e.offsetX, e.offsetY, lastX, lastY);
-            chatSocket.send(JSON.stringify({'type': 'drawing', 'x': e.offsetX, 'y': e.offsetY, 'lastX': lastX, 'lastY': lastY}));
-            [lastX, lastY] = [e.offsetX, e.offsetY];
-        } else {
-            if (!throttleTimer) {
-                throttleTimer = setTimeout(() => {
-                    chatSocket.send(JSON.stringify({'type': 'cursor_move', 'x': e.offsetX, 'y': e.offsetY}));
-                    throttleTimer = null;
-                }, 50);
-            }
-        }
+    canvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        [lastX, lastY] = [e.offsetX, e.offsetY];
     });
 
+    canvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+        const currentX = e.offsetX; const currentY = e.offsetY;
+        draw(currentX, currentY, lastX, lastY);
+        chatSocket.send(JSON.stringify({
+            'type': 'drawing', 'x': currentX, 'y': currentY, 'lastX': lastX, 'lastY': lastY
+        }));
+        [lastX, lastY] = [currentX, currentY];
+    });
+
+    // Upraveno: ukládáme do historie po dokončení tahu
+    canvas.addEventListener('mouseup', () => {
+        if (isDrawing) {
+            isDrawing = false;
+            saveHistory(); // Uložíme nový stav do historie
+            saveCanvasState();
+        }
+    });
+    canvas.addEventListener('mouseout', () => {
+        if (isDrawing) { isDrawing = false; }
+    });
+
+    // --- Logika pro tlačítka plátna ---
     const clearCanvasBtn = document.getElementById('clear-canvas-btn');
+    const undoCanvasBtn = document.getElementById('undo-canvas-btn');
+
     function clearCanvas() {
-        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = '#FFFFFF';
+        context.fillRect(0, 0, canvas.width, canvas.height);
     }
+    
     clearCanvasBtn.addEventListener('click', () => {
-        clearCanvas(); saveHistory(); saveCanvasState();
+        clearCanvas();
+        saveHistory(); // Uložíme i prázdný stav
+        saveCanvasState();
         chatSocket.send(JSON.stringify({'type': 'clear_canvas'}));
     });
-    
-    document.getElementById('undo-canvas-btn').addEventListener('click', () => {
+
+    undoCanvasBtn.addEventListener('click', () => {
         if (historyStep > 0) {
             historyStep--;
             const image = new Image();
-            image.onload = () => {
-                clearCanvas();
+            image.onload = function() {
+                context.clearRect(0, 0, canvas.width, canvas.height);
                 context.drawImage(image, 0, 0);
+                // Uložíme vrácený stav na server
                 saveCanvasState(); 
+                // A pošleme ostatním příkaz na překreslení na tento stav
+                chatSocket.send(JSON.stringify({
+                    'type': 'force_redraw',
+                    'content': image.src
+                }));
             };
             image.src = history[historyStep];
         }
     });
 
-    // --- HLAVNÍ FUNKCE PRO ZPRACOVÁNÍ ZPRÁV ---
-    const typingUsers = new Map();
-    const typingIndicator = document.getElementById('typing-indicator');
-    const canvasWrapper = document.getElementById('canvas-wrapper');
-    const remoteCursors = new Map();
-    let throttleTimer;
-
-    function updateTypingIndicator() {
-        const users = Array.from(typingUsers.keys());
-        if (users.length === 0) { typingIndicator.textContent = ''; }
-        else if (users.length === 1) { typingIndicator.textContent = `${users[0]} píše...`; }
-        else { typingIndicator.textContent = 'Více lidí píše...'; }
-    }
-
-    function updateRemoteCursors() {
-        document.querySelectorAll('.remote-cursor').forEach(c => c.remove());
-        for (const [username, pos] of remoteCursors.entries()) {
-            const cursorDiv = document.createElement('div');
-            cursorDiv.className = 'remote-cursor';
-            cursorDiv.style.left = `${pos.x}px`;
-            cursorDiv.style.top = `${pos.y}px`;
-            cursorDiv.textContent = username;
-            canvasWrapper.appendChild(cursorDiv);
-        }
-    }
-
+    // --- Hlavní funkce pro zpracování zpráv z WebSocketu ---
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
-        switch(data.type) {
-            case 'chat_message':
-                const messageElement = document.createElement('div');
-                messageElement.innerHTML = `<span class="message-time">${data.timestamp}</span> <b>${data.username}</b>: <span>${data.message}</span>`;
-                chatLog.appendChild(messageElement);
-                chatLog.scrollTop = chatLog.scrollHeight;
-                break;
-            case 'user_list_update':
-                const userList = document.getElementById('user-list');
-                userList.innerHTML = '';
-                data.users.forEach(user => {
-                    const li = document.createElement('li');
-                    li.textContent = user;
-                    if (user === currentUsername) { li.style.fontWeight = 'bold'; }
-                    userList.appendChild(li);
-                });
-                break;
-            case 'typing_indicator':
-                if (typingUsers.has(data.username)) clearTimeout(typingUsers.get(data.username));
-                const timer = setTimeout(() => {
-                    typingUsers.delete(data.username);
-                    updateTypingIndicator();
-                }, 2000);
-                typingUsers.set(data.username, timer);
-                updateTypingIndicator();
-                break;
-            case 'drawing':
-                draw(data.x, data.y, data.lastX, data.lastY);
-                break;
-            case 'clear_canvas':
-                clearCanvas(); saveHistory();
-                break;
-            case 'cursor_update':
-                remoteCursors.set(data.username, { x: data.x, y: data.y });
-                updateRemoteCursors();
-                setTimeout(() => {
-                    remoteCursors.delete(data.username);
-                    updateRemoteCursors();
-                }, 2000);
-                break;
+
+        if (data.type === 'chat_message') {
+            const messageElement = document.createElement('div');
+            messageElement.innerHTML = `<span class="message-time">${data.timestamp}</span> <b>${data.username}</b>: <span>${data.message}</span>`;
+            chatLog.appendChild(messageElement);
+            chatLog.scrollTop = chatLog.scrollHeight;
+        } else if (data.type === 'drawing') {
+            draw(data.x, data.y, data.lastX, data.lastY);
+        } else if (data.type === 'clear_canvas') {
+            clearCanvas();
+        } else if (data.type === 'force_redraw') { // Nový typ zprávy
+            const image = new Image();
+            image.onload = function() {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                context.drawImage(image, 0, 0);
+            };
+            image.src = data.content;
         }
     };
     
     chatLog.scrollTop = chatLog.scrollHeight;
+
 </script>
 {% endblock %}
