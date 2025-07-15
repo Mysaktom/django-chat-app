@@ -44,10 +44,10 @@
     <div id="canvas-view" class="view">
         <div id="canvas-wrapper">
             <canvas id="drawing-canvas" width="800" height="550"></canvas>
-        </div>
-        <div style="text-align: center; margin-top: 10px;">
-            <button id="undo-canvas-btn" class="logout-button" style="background-color: #ffc107; color: black;">Zpět</button>
-            <button id="clear-canvas-btn" class="logout-button">Vymazat plátno</button>
+            <div class="canvas-buttons">
+                <button id="undo-canvas-btn" class="logout-button" style="background-color: #ffc107; color: black;">Zpět</button>
+                <button id="clear-canvas-btn" class="logout-button">Vymazat plátno</button>
+            </div>
         </div>
     </div>
 </div>
@@ -55,7 +55,6 @@
 {{ room_name|json_script:"room-name-json" }}
 {{ canvas_content|default_if_none:"null"|json_script:"canvas-content-json" }}
 {{ user.username|json_script:"current-user-json" }}
-
 <script>
     // --- ZÁKLADNÍ PROMĚNNÉ ---
     const roomName = JSON.parse(document.getElementById('room-name-json').textContent);
