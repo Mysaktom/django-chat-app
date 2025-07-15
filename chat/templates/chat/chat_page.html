@@ -38,10 +38,10 @@
     </div>
 
     <div id="canvas-view" class="view">
-        <canvas id="drawing-canvas" width="800" height="550"></canvas>
-        <div style="text-align: center; margin-top: 10px;">
-            <button id="clear-canvas-btn" class="logout-button">Vymazat plátno</button>
-        </div>
+    <canvas id="drawing-canvas" width="800" height="550"></canvas>
+    <div style="text-align: center; margin-top: 10px;">
+        <button id="undo-canvas-btn" class="logout-button" style="background-color: #ffc107b4; color: black;">Zpět</button>
+        <button id="clear-canvas-btn" class="logout-button">Vyčistit plátno</button>
     </div>
 </div>
 
@@ -66,8 +66,7 @@
     document.querySelector('#chat-message-submit').onclick = function(e) {
         if (messageInput.value.trim() !== '') {
             chatSocket.send(JSON.stringify({
-                'type': 'chat_message',
-                'message': messageInput.value
+                'type': 'chat_message', 'message': messageInput.value
             }));
             messageInput.value = '';
         }
@@ -80,16 +79,12 @@
     const canvasView = document.getElementById('canvas-view');
 
     showChatBtn.addEventListener('click', () => {
-        chatView.style.display = 'block';
-        canvasView.style.display = 'none';
-        showChatBtn.classList.add('active');
-        showCanvasBtn.classList.remove('active');
+        chatView.style.display = 'block'; canvasView.style.display = 'none';
+        showChatBtn.classList.add('active'); showCanvasBtn.classList.remove('active');
     });
     showCanvasBtn.addEventListener('click', () => {
-        canvasView.style.display = 'block';
-        chatView.style.display = 'none';
-        showCanvasBtn.classList.add('active');
-        showChatBtn.classList.remove('active');
+        canvasView.style.display = 'block'; chatView.style.display = 'none';
+        showCanvasBtn.classList.add('active'); showChatBtn.classList.remove('active');
     });
     canvasView.style.display = 'none';
 
@@ -100,36 +95,46 @@
     let lastX = 0;
     let lastY = 0;
 
+    // NOVINKA: Historie pro funkci Zpět
+    let history = [];
+    let historyStep = -1;
+
+    // Funkce pro uložení aktuálního stavu do historie
+    function saveHistory() {
+        // Pokud jsme se v historii vrátili, smažeme všechny budoucí kroky
+        if (historyStep < history.length - 1) {
+            history.splice(historyStep + 1);
+        }
+        history.push(canvas.toDataURL());
+        historyStep++;
+    }
+
     // Načtení uložené kresby při startu
     if (initialCanvasContent) {
         const image = new Image();
         image.onload = function() {
             context.drawImage(image, 0, 0);
+            saveHistory(); // Uložíme počáteční stav jako první krok historie
         };
         image.src = initialCanvasContent;
+    } else {
+        saveHistory(); // Uložíme prázdné plátno jako první krok
     }
 
+
     function draw(x, y, prevX, prevY) {
-        context.strokeStyle = '#000000';
-        context.lineWidth = 3;
-        context.lineJoin = 'round';
-        context.lineCap = 'round';
-        context.beginPath();
-        context.moveTo(prevX, prevY);
-        context.lineTo(x, y);
-        context.stroke();
+        context.strokeStyle = '#000000'; context.lineWidth = 3;
+        context.lineJoin = 'round'; context.lineCap = 'round';
+        context.beginPath(); context.moveTo(prevX, prevY);
+        context.lineTo(x, y); context.stroke();
     }
 
     function saveCanvasState() {
         const dataURL = canvas.toDataURL();
-        // Ujistíme se, že máme CSRF token
         const csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
         fetch(`/save-canvas/${roomName}/`, {
             method: 'POST',
-            headers: {
-                'X-CSRFToken': csrftoken,
-                'Content-Type': 'application/json'
-            },
+            headers: {'X-CSRFToken': csrftoken, 'Content-Type': 'application/json'},
             body: JSON.stringify({'content': dataURL})
         });
     }
@@ -141,8 +146,7 @@
 
     canvas.addEventListener('mousemove', (e) => {
         if (!isDrawing) return;
-        const currentX = e.offsetX;
-        const currentY = e.offsetY;
+        const currentX = e.offsetX; const currentY = e.offsetY;
         draw(currentX, currentY, lastX, lastY);
         chatSocket.send(JSON.stringify({
             'type': 'drawing', 'x': currentX, 'y': currentY, 'lastX': lastX, 'lastY': lastY
@@ -150,32 +154,54 @@
         [lastX, lastY] = [currentX, currentY];
     });
 
+    // Upraveno: ukládáme do historie po dokončení tahu
     canvas.addEventListener('mouseup', () => {
         if (isDrawing) {
             isDrawing = false;
+            saveHistory(); // Uložíme nový stav do historie
             saveCanvasState();
         }
     });
     canvas.addEventListener('mouseout', () => {
-        if (isDrawing) {
-            isDrawing = false;
-            saveCanvasState();
-        }
+        if (isDrawing) { isDrawing = false; }
     });
 
-    // --- Logika pro mazání plátna ---
+    // --- Logika pro tlačítka plátna ---
     const clearCanvasBtn = document.getElementById('clear-canvas-btn');
+    const undoCanvasBtn = document.getElementById('undo-canvas-btn');
+
     function clearCanvas() {
         context.fillStyle = '#FFFFFF';
         context.fillRect(0, 0, canvas.width, canvas.height);
     }
+    
     clearCanvasBtn.addEventListener('click', () => {
         clearCanvas();
+        saveHistory(); // Uložíme i prázdný stav
         saveCanvasState();
         chatSocket.send(JSON.stringify({'type': 'clear_canvas'}));
     });
 
-    // --- Hlavní funkce pro zpracování VŠECH zpráv z WebSocketu (OPRAVENO) ---
+    undoCanvasBtn.addEventListener('click', () => {
+        if (historyStep > 0) {
+            historyStep--;
+            const image = new Image();
+            image.onload = function() {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                context.drawImage(image, 0, 0);
+                // Uložíme vrácený stav na server
+                saveCanvasState(); 
+                // A pošleme ostatním příkaz na překreslení na tento stav
+                chatSocket.send(JSON.stringify({
+                    'type': 'force_redraw',
+                    'content': image.src
+                }));
+            };
+            image.src = history[historyStep];
+        }
+    });
+
+    // --- Hlavní funkce pro zpracování zpráv z WebSocketu ---
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
 
@@ -188,9 +214,17 @@
             draw(data.x, data.y, data.lastX, data.lastY);
         } else if (data.type === 'clear_canvas') {
             clearCanvas();
+        } else if (data.type === 'force_redraw') { // Nový typ zprávy
+            const image = new Image();
+            image.onload = function() {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                context.drawImage(image, 0, 0);
+            };
+            image.src = data.content;
         }
     };
     
     chatLog.scrollTop = chatLog.scrollHeight;
+
 </script>
 {% endblock %}
