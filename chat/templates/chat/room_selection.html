@@ -2,17 +2,17 @@
 
 {% block content %}
 <div class="form-container">
-    <h2>Zadejte název místnosti</h2>
-    <p>Vytvořte novou místnost nebo vstupte do existující.</p>
+    <h2>Enter a Room Name</h2>
+    <p>Create a new room or enter an existing one.</p>
     
     <div class="input-group">
-        <input type="text" id="room-name-input" placeholder="např. nova-mistnost">
-        <button id="enter-room-button" class="btn-action">Vstoupit</button>
+        <input type="text" id="room-name-input" placeholder="e.g., general-discussion">
+        <button id="enter-room-button" class="btn-action">Enter</button>
     </div>
 
     {% if rooms %}
         <div class="room-list">
-            <h3>Nebo vyber z existujících:</h3>
+            <h3>Or choose from existing:</h3>
             {% for room in rooms %}
                 <a href="#" class="room-link" data-roomname="{{ room.name }}">{{ room.name }}</a>
             {% endfor %}
@@ -22,20 +22,20 @@
 
 <div id="rules-modal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
-        <h3>Pravidla Chatu</h3>
+        <h3>Chat Rules</h3>
         <ul>
-            <li>Chovejte se k ostatním s respektem.</li>
-            <li>Žádný spam ani reklama.</li>
-            <li>Udržujte konverzaci relevantní k tématu místnosti.</li>
-            <li>Nezveřejňujte nelegální nebo nevhodný obsah.</li>
-            <li>Administrátoři mají právo kdykoliv bez varování smazat zprávu nebo zablokovat uživatele, který porušuje pravidla.</li>
+            <li>Be respectful to others.</li>
+            <li>No spam or advertising.</li>
+            <li>Keep the conversation relevant to the room's topic.</li>
+            <li>Do not post illegal or inappropriate content.</li>
+            <li>Admins have the right to ban users who violate the rules.</li>
         </ul>
         <div class="consent-check">
             <input type="checkbox" id="rules-consent-checkbox">
-            <label for="rules-consent-checkbox">Rozumím a souhlasím s pravidly.</label>
+            <label for="rules-consent-checkbox">I understand and agree to the rules.</label>
         </div>
-        <button id="confirm-enter-room" disabled>Vstoupit do místnosti</button>
-        <button id="cancel-enter-room">Zrušit</button>
+        <button id="confirm-enter-room" disabled>Enter Room</button>
+        <button id="cancel-enter-room">Cancel</button>
     </div>
 </div>
 

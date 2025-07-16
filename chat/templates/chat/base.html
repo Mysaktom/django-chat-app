@@ -10,28 +10,23 @@
         <div class="nav-brand">
             <a href="{% url 'room-selection' %}">Neustadt Chat</a>
         </div>
-        
         <div class="nav-user">
             {% if user.is_authenticated %}
-                
                 {% if room_name %}
-                    <span class="nav-room-name">Místnost: <b>{{ room_name }}</b></span>
+                    <span class="nav-room-name">Room: <b>{{ room_name }}</b></span>
                     <span id="online-user-count" class="nav-link" style="display: none;"></span>
                 {% endif %}
-
-                <span>Uživatel: {{ user.username }}</span>
-                <a href="{% url 'password-change' %}" class="nav-link">Změnit heslo</a>
+                <span>User: {{ user.username }}</span>
+                <a href="{% url 'password-change' %}" class="nav-link">Change Password</a>
                 <form method="post" action="{% url 'logout' %}" class="logout-form">
                     {% csrf_token %}
-                    <button type="submit" class="logout-button">Odhlásit</button>
+                    <button type="submit" class="logout-button">Logout</button>
                 </form>
             {% endif %}
         </div>
     </nav>
-
     <main class="main-content">
-        {% block content %}
-        {% endblock %}
+        {% block content %}{% endblock %}
     </main>
 </body>
 </html>
