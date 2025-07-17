@@ -45,3 +45,7 @@ def save_canvas(request, room_name):
         return JsonResponse({'status': 'ok'})
     except Room.DoesNotExist:
         return JsonResponse({'status': 'error'}, status=404)
+    
+@login_required
+def notification_settings(request):
+    return render(request, 'chat/notification_settings.html')

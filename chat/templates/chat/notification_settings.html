@@ -1,0 +1,31 @@
+{% extends 'chat/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'chat/notification_settings.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Manage Notifications</h2>
+    <p>Adjust your notification settings. Changes are saved automatically in your browser.</p>
+
+    <div class="setting-row">
+        <label for="volume-slider">Volume</label>
+        <input type="range" id="volume-slider" min="0" max="1" step="0.1">
+        <span id="volume-value">100%</span>
+    </div>
+
+    <div class="setting-row">
+        <label for="delay-input">Cooldown (seconds)</label>
+        <input type="number" id="delay-input" min="0" value="5">
+        <p class="setting-desc">Time before a new notification can play.</p>
+    </div>
+
+    <div class="setting-row">
+         <button id="test-notification-btn" class="btn-action">Test Sound</button>
+    </div>
+</div>
+
+<script src="{% static 'chat/notification_settings.js' %}"></script>
+{% endblock %}

@@ -60,7 +60,8 @@
     const canvas = document.getElementById('drawing-canvas');
     const context = canvas.getContext('2d');
     // Zvuk pro notifikace
-    const notificationSound = new Audio("{% static 'chat/notification.mp3' %}");
+    const notificationSound = document.getElementById('notification-sound-src');
+    let lastNotificationTime = 0; // Čas poslední notifikace
 
     // WebSocket připojení
     const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
@@ -205,11 +206,20 @@
 
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
+
         switch(data.type) {
             case 'chat_message':
-                if (data.username !==  currentUsername && document.hidden) { // Kontroluje, zda je uživatel neaktivní a nevidí zprávu
-                    notificationSound.play(); // Přehrání zvuku pro příchozí zprávu
+                if (data.username !== currentUsername && document.hidden) {
+                // Získá nastavenou prodlevu z localStorage (v sekundách), výchozí je 5
+                const delay = (localStorage.getItem('notification_delay') || 5) * 1000; // Převedeme na milisekundy
+
+                // Přehrje zvuk, jen pokud uplynula nastavená prodleva
+                if (Date.now() - lastNotificationTime > delay) {
+                    notificationSound.volume = localStorage.getItem('notification_volume') || 1;
+                    notificationSound.play().catch(error => console.log("Notification sound playback failed:", error));
+                    lastNotificationTime = Date.now(); // Aktualizujeme čas poslední notifikace
                 }
+            }
                 const messageElement = document.createElement('div');
                 messageElement.innerHTML = `<span class="message-time">${data.timestamp}</span> <b>${data.username}</b>: <span>${data.message}</span>`;
                 chatLog.appendChild(messageElement);

@@ -5,6 +5,8 @@
     <title>Neustadt Chat</title>
     <link rel="stylesheet" href="{% static 'chat/style.css' %}">
     <link rel="icon" href="{% static 'chat/favicon.ico' %}" type="image/x-icon">
+
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
     <nav class="main-nav">
@@ -15,9 +17,9 @@
             {% if user.is_authenticated %}
                 {% if room_name %}
                     <span class="nav-room-name">Room: <b>{{ room_name }}</b></span>
-                    <span id="online-user-count" class="nav-link" style="display: none;"></span>
                 {% endif %}
                 <span>User: {{ user.username }}</span>
+                <a href="{% url 'notification-settings' %}" class="nav-link">Notifications</a> <!-- Odkaz na nastavení notifikací -->
                 <a href="{% url 'password-change' %}" class="nav-link">Change Password</a>
                 <form method="post" action="{% url 'logout' %}" class="logout-form">
                     {% csrf_token %}
@@ -29,5 +31,7 @@
     <main class="main-content">
         {% block content %}{% endblock %}
     </main>
+    
+    <audio id="notification-sound-src" src="{% static 'chat/notification.mp3' %}" preload="auto" style="display:none;"></audio>
 </body>
 </html>
