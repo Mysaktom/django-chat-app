@@ -207,7 +207,7 @@
         const data = JSON.parse(e.data);
         switch(data.type) {
             case 'chat_message':
-                if (data.username !==  currentUsername && !document.hidden) { // Kontroluje, zda je uživatel aktivní a nevidí zprávu
+                if (data.username !==  currentUsername && document.hidden) { // Kontroluje, zda je uživatel neaktivní a nevidí zprávu
                     notificationSound.play(); // Přehrání zvuku pro příchozí zprávu
                 }
                 const messageElement = document.createElement('div');
