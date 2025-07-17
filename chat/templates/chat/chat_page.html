@@ -49,6 +49,7 @@
 
 
 <script>
+ document.addEventListener('DOMContentLoaded', () => {
     // --- ZÁKLADNÍ PROMĚNNÉ ---
     const roomName = JSON.parse(document.getElementById('room-name-json').textContent);
     const currentUsername = JSON.parse(document.getElementById('current-user-json').textContent);
@@ -260,5 +261,8 @@
     };
 
     chatLog.scrollTop = chatLog.scrollHeight; // Automatické posouvání na konec
+    
+ });
+    
 </script>
 {% endblock %}
