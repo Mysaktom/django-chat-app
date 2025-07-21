@@ -121,4 +121,4 @@ EMAIL_HOST_USER = 'apikey' # Toto je doslova slovo 'apikey', neměň to
 EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'support@neustadt-chat.onrender.com' # Email, který se zobrazí jako odesílatel
+DEFAULT_FROM_EMAIL = 'tomastrefny05@gmail.com' # Email, který se zobrazí jako odesílatel
