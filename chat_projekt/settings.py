@@ -117,8 +117,10 @@ LOGOUT_REDIRECT_URL = 'login'
 # --- NASTAVENÍ PRO ODESÍLÁNÍ EMAILŮ ---
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'apikey' # Toto je doslova slovo 'apikey', neměň to
+EMAIL_HOST_USER = 'apikey'
 EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'tomastrefny05@gmail.com' # Email, který se zobrazí jako odesílatel
+DEFAULT_FROM_EMAIL = 'tomastrefny05@gmail.com' # Email, ze kterého se posílá
+# TENTO ŘÁDEK PŘIDEJ:
+SERVER_EMAIL = 'tomastrefny05@gmail.com' # Ujistí SendGrid, že odesílatel je ověřený
