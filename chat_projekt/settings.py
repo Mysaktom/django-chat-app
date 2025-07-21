@@ -95,21 +95,30 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Internationalization
+# Jazyk a časové pásmo
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# Statické soubory (CSS, JavaScript, obrázky)
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles' # Složka, kam se sesbírají všechny statické soubory
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Default primary key field type
+# Použijeme BigAutoField pro automatické ID
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Přesměrování po přihlášení a odhlášení
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'room-selection' # Přesměrování na výběr místnosti
 LOGOUT_REDIRECT_URL = 'login'
+
+# --- NASTAVENÍ PRO ODESÍLÁNÍ EMAILŮ ---
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'apikey' # Toto je doslova slovo 'apikey', neměň to
+EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'support@neustadt-chat.onrender.com' # Email, který se zobrazí jako odesílatel

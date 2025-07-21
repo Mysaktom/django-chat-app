@@ -33,4 +33,7 @@ urlpatterns = [
     path('save-canvas/<str:room_name>/', views.save_canvas, name='save-canvas'),
     # Nastavení notifikací
     path('notifications/settings/', views.notification_settings, name='notification-settings'),
+    # Cesty pro podporu
+    path('support/', views.support_page, name='support-page'),
+    path('support/sent/', views.support_sent, name='support-sent'),
 ]

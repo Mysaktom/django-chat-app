@@ -1,0 +1,16 @@
+{% extends 'chat/base.html' %}
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'chat/support.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="support-container">
+    <h2>Message Sent!</h2>
+    <p class="description">Thank you for your feedback. We will get back to you shortly.</p>
+    <div style="text-align: center;">
+        <a href="{% url 'room-selection' %}">Back to Room Selection</a>
+    </div>
+</div>
+{% endblock %}
