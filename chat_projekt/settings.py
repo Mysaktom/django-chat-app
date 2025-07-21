@@ -121,6 +121,6 @@ EMAIL_HOST_USER = 'apikey'
 EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'tomastrefny05@gmail.com' # Email, ze kterého se posílá
+DEFAULT_FROM_EMAIL = 'admin-nosdid@proton.me' # Email, ze kterého se posílá
 # TENTO ŘÁDEK PŘIDEJ:
-SERVER_EMAIL = 'tomastrefny05@gmail.com' # Ujistí SendGrid, že odesílatel je ověřený
+SERVER_EMAIL = 'admin-nosdid@proton.me' # Ujistí SendGrid, že odesílatel je ověřený
