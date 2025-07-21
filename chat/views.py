@@ -81,7 +81,7 @@ def support_page(request):
                 f'Support Request: {subject}',
                 full_message,
                 None, # Tímto se automaticky použije DEFAULT_FROM_EMAIL
-                ['admin-nosdid@proton.me'], # Zde zadej email podpory, kam se má zpráva poslat
+                ['nosdid05@gmail.com'], # Zde zadej email podpory, kam se má zpráva poslat
             )
             return redirect('support-sent')
     else:
