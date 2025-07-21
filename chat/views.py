@@ -84,3 +84,8 @@ def support_page(request):
         form = SupportForm()
         
     return render(request, 'chat/support_page.html', {'form': form})
+
+@login_required
+def support_sent(request):
+    """Zobrazí děkovací stránku po odeslání formuláře."""
+    return render(request, 'chat/support_sent.html')
