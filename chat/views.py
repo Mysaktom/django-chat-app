@@ -60,23 +60,27 @@ def support_page(request):
         if form.is_valid():
             subject = form.cleaned_data['subject']
             message = form.cleaned_data['message']
-            user_email = request.user.email or 'noreply@chatapp.com' # Výchozí, pokud uživatel nemá email
+            user_email = request.user.email or 'Uživatel nemá zadaný email'
 
-            # Sestavení zprávy a odeslání
-            full_message = f"Message from: {request.user.username} ({user_email})\n\n{message}"
+            # Sestavíme zprávu tak, aby obsahovala email uživatele pro odpověď
+            full_message = f"""
+            Zpráva od uživatele: {request.user.username}
+            Email pro odpověď: {user_email}
+            ------------------------------------
+
+            {message}
+            """
+
+            # ZDE JE DŮLEŽITÁ ZMĚNA:
+            # Jako odesílatele (from_email) použijeme tvůj ověřený email ze settings.py
             send_mail(
-                f'Support Request: {subject}', # Předmět
-                full_message, # Zpráva
-                'support@neustadt-chat.onrender.com', # Odesílatel (může být cokoliv)
-                ['tomastrefny05@gmail.com'], # Můj email pro příjem podpory
-                fail_silently=False, # Pokud dojde k chybě, Django ji vyhodí
+                f'Support Request: {subject}',
+                full_message,
+                None, # Tímto se automaticky použije DEFAULT_FROM_EMAIL
+                ['tomastrefny05@gmail.com'], # Tvůj email, kam to přijde
             )
             return redirect('support-sent')
     else:
         form = SupportForm()
         
     return render(request, 'chat/support_page.html', {'form': form})
-
-@login_required
-def support_sent(request):
-    return render(request, 'chat/support_sent.html')
