@@ -55,6 +55,8 @@ def save_canvas(request, room_name):
 def notification_settings(request):
     return render(request, 'chat/notification_settings.html')
 
+# chat/views.py
+
 @login_required
 def support_page(request):
     if request.method == 'POST':
