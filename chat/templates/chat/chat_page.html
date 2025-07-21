@@ -210,15 +210,18 @@
 
         switch(data.type) {
             case 'chat_message':
-                if (data.username !== currentUsername && document.hidden) {
-                    const delay = (localStorage.getItem('notification_delay') || 5) * 1000;
-                    if (Date.now() - lastNotificationTime > delay) {
-                        notificationSound.volume = localStorage.getItem('notification_volume') || 1;
-                        notificationSound.play().catch(error => console.log("Sound playback failed:", error));
-                        lastNotificationTime = Date.now();
-                    }
-                }
+               if (data.username !== currentUsername && document.hidden) {
+                // Vytvoříme klíče specifické pro uživatele
+                const volumeKey = `notification_volume_${currentUsername}`;
+                const delayKey = `notification_delay_${currentUsername}`;
 
+                const delay = (localStorage.getItem(delayKey) || 5) * 1000;
+                if (Date.now() - lastNotificationTime > delay) {
+                    notificationSound.volume = localStorage.getItem(volumeKey) || 1;
+                    notificationSound.play().catch(error => console.log("Přehrání zvuku vyžaduje interakci.", error));
+                    lastNotificationTime = Date.now();
+                }
+            }   
                 const messageElement = document.createElement('div');
                 messageElement.innerHTML = `<span class="message-time">${data.timestamp}</span> <b>${data.username}</b>: <span>${data.message}</span>`;
                 chatLog.appendChild(messageElement);

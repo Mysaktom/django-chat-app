@@ -33,4 +33,7 @@
 </div>
 
 <script src="{% static 'chat/notification_settings.js' %}"></script>
+
+{{ user.username|json_script:"current-user-json" }}  
+
 {% endblock %}

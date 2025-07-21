@@ -401,3 +401,10 @@ body {
 #confirm-enter-room:hover:not(:disabled) {
     background-color: #218838;
 }
+/* --- Hlavní patička --- */
+.main-footer {
+    background-color: #f8f9fa;
+    padding: 10px 20px;
+    text-align: center;
+    border-top: 1px solid #eee;
+}

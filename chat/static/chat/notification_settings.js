@@ -1,33 +1,34 @@
-// chat/static/chat/notification_settings.js
 document.addEventListener('DOMContentLoaded', () => {
+    // Získáme jméno aktuálního uživatele z HTML (přidáme ho v dalším kroku)
+    const currentUsername = JSON.parse(document.getElementById('current-user-json').textContent);
+    
+    // Vytvoříme unikátní klíče pro každého uživatele
+    const volumeKey = `notification_volume_${currentUsername}`;
+    const delayKey = `notification_delay_${currentUsername}`;
+
     const volumeSlider = document.getElementById('volume-slider');
     const volumeValue = document.getElementById('volume-value');
     const delayInput = document.getElementById('delay-input');
     const testBtn = document.getElementById('test-notification-btn');
-    
-    // Načtení zvuku
-    const notificationSound = new Audio(document.getElementById('notification-sound-src').getAttribute('src'));
+    const notificationSound = document.getElementById('notification-sound-src');
 
-    // Načtení uložených hodnot, nebo nastavení výchozích
-    volumeSlider.value = localStorage.getItem('notification_volume') || 1;
-    delayInput.value = localStorage.getItem('notification_delay') || 5;
+    // Načítáme a ukládáme hodnoty pod unikátními klíči
+    volumeSlider.value = localStorage.getItem(volumeKey) || 1;
+    delayInput.value = localStorage.getItem(delayKey) || 5;
     volumeValue.textContent = `${Math.round(volumeSlider.value * 100)}%`;
 
-    // Uložení hlasitosti při změně
     volumeSlider.addEventListener('input', () => {
         const volume = volumeSlider.value;
-        localStorage.setItem('notification_volume', volume);
+        localStorage.setItem(volumeKey, volume);
         volumeValue.textContent = `${Math.round(volume * 100)}%`;
     });
 
-    // Uložení prodlevy při změně
     delayInput.addEventListener('input', () => {
-        localStorage.setItem('notification_delay', delayInput.value);
+        localStorage.setItem(delayKey, delayInput.value);
     });
 
-    // Testovací tlačítko
     testBtn.addEventListener('click', () => {
-        notificationSound.volume = localStorage.getItem('notification_volume') || 1;
+        notificationSound.volume = localStorage.getItem(volumeKey) || 1;
         notificationSound.play();
     });
 });
