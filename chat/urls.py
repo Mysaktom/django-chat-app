@@ -4,6 +4,7 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import LoginView, LogoutView 
 from . import views
 
+
 urlpatterns = [
     # Cesty pro chat
     path('chat/', views.room_selection, name='room-selection'),
@@ -36,4 +37,6 @@ urlpatterns = [
     # Cesty pro podporu
     path('support/', views.support_page, name='support-page'),
     path('support/sent/', views.support_sent, name='support-sent'),
+    # Cesta pro změnu emailu
+    path('profile/', views.profile_page, name='profile-page'),
 ]

@@ -19,11 +19,12 @@
                     <span class="nav-room-name">Room: <b>{{ room_name }}</b></span>
                 {% endif %}
                 <span>User: {{ user.username }}</span>
+                <a href="{% url 'profile-page' %}" class="nav-link">Profile</a> <!-- Odkaz na stránku profilu -->
                 <a href="{% url 'support-page' %}" class="nav-link">Support</a> <!-- Odkaz na stránku podpory -->
                 <a href="{% url 'notification-settings' %}" class="nav-link">Notifications</a> <!-- Odkaz na nastavení notifikací -->
                 <a href="{% url 'password-change' %}" class="nav-link">Change Password</a>
                 <form method="post" action="{% url 'logout' %}" class="logout-form">
-                    
+
                 {% csrf_token %}
                     <button type="submit" class="logout-button">Logout</button>
                 </form>

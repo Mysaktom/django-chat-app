@@ -7,7 +7,9 @@ from django.views.decorators.http import require_POST
 import json
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
-from .forms import SupportForm 
+from .forms import SupportForm, EmailChangeForm
+from django.contrib import messages # Přidej tento import
+
 
 @login_required
 def room_selection(request):
@@ -89,3 +91,18 @@ def support_page(request):
 def support_sent(request):
     """Zobrazí děkovací stránku po odeslání formuláře."""
     return render(request, 'chat/support_sent.html')
+
+@login_required
+def profile_page(request):
+    if request.method == 'POST':
+        # Zpracováváme odeslaný formulář
+        form = EmailChangeForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save() # Uloží změny pro aktuálně přihlášeného uživatele
+            messages.success(request, 'Your email has been updated successfully!')
+            return redirect('profile-page')
+    else:
+        # Zobrazíme formulář s předvyplněnými daty
+        form = EmailChangeForm(instance=request.user)
+
+    return render(request, 'chat/profile_page.html', {'form': form})
